@@ -9,9 +9,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.104.0/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--serif:"Cormorant Garamond",Georgia,serif;--navy:#101D35;--on:#fff;--on2:#C5CBD5;--k1:#F6EAD7;--k1t:#101D35;--k2:#101D35;--k2t:#fff;--k3:#E4E9F2;--k3t:#101D35;--dbd:rgba(197,203,213,.35);--acc:#D9AD59;--edge:rgba(217,173,89,.6);--blue2:#243858;--silver:#C5CBD5;--gold:#D9AD59;--goldtx:#8A5F0E;--bg:#EEF1F6;--card:#fff;--ink:#101D35;--mute:#5A667C;--line:#DDE2EA;--ok:#1F7A5A;--bad:#B3392F;--blue:#2A63BF;--hd:#101D35;--btn:#101D35;--btnink:#fff;--focus:#2A63BF;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--serif:"Cormorant Garamond",Georgia,serif;--navy:#101D35;--on:#fff;--on2:#C5CBD5;--k1:#F6EAD7;--k1t:#101D35;--k2:#101D35;--k2t:#fff;--k3:#E4E9F2;--k3t:#101D35;--dbd:rgba(197,203,213,.35);--acc:#D9AD59;--edge:rgba(217,173,89,.6);--blue2:#243858;--silver:#C5CBD5;--gold:#D9AD59;--goldtx:#8A5F0E;--bg:#EEF1F6;--card:#fff;--ink:#101D35;--mute:#5A667C;--line:#DDE2EA;--ok:#1F7A5A;--bad:#B3392F;--blue:#2A63BF;--hd:#101D35;--btn:#101D35;--btnink:#fff;--focus:#2A63BF;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A1220;--card:#14233D;--ink:#E8ECF3;--mute:#9AA6BA;--line:#263858;--goldtx:#D9AD59;--ok:#5CC9A0;--bad:#F08A80;--blue:#7FB0F5;--btn:#C5CBD5;--btnink:#101D35;--focus:#C5CBD5}}
 :root[data-theme="dark"]{--bg:#0A1220;--card:#14233D;--ink:#E8ECF3;--mute:#9AA6BA;--line:#263858;--goldtx:#D9AD59;--ok:#5CC9A0;--bad:#F08A80;--blue:#7FB0F5;--btn:#C5CBD5;--btnink:#101D35;--focus:#C5CBD5}
 *,*::before,*::after{box-sizing:border-box}
@@ -99,7 +99,7 @@ header{border-radius:0 0 24px 24px;gap:12px}
 .brand{font-size:23px}
 .adm{font:500 10px var(--sans);letter-spacing:.4em;color:var(--on2);margin-top:3px}
 .vr{width:1px;height:34px;background:var(--edge);flex:none}
-.tg{font:italic 15px Georgia,serif;color:var(--on2);flex:1;line-height:1.2}
+.tg{font:500 13px/1.3 var(--sans);letter-spacing:.02em;color:var(--on2);flex:1}
 .av{width:40px;height:40px;border-radius:50%;border:1px solid var(--edge);background:transparent;color:var(--on);font:700 13px var(--sans);cursor:pointer;padding:0;flex:none}
 main{padding:18px 14px 150px}
 .hello small{display:block;font-size:14px;color:var(--mute)}
@@ -109,7 +109,7 @@ main{padding:18px 14px 150px}
 .dt svg{flex:none}
 .k3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
 .kc{display:flex;flex-direction:column;text-align:left;border:1px solid var(--line);border-radius:18px;padding:12px 10px;font:inherit;cursor:pointer;min-height:178px;min-width:0}
-.kc.a{background:var(--k1);color:var(--k1t)}.kc.b{background:var(--k2);color:var(--k2t)}.kc.c{background:var(--k3);color:var(--k3t)}
+.kc.a{background:var(--k1);color:var(--k1t)}.kc.kb{background:var(--k2);color:var(--k2t)}.kc.c{background:var(--k3);color:var(--k3t)}
 .kc .ic{width:36px;height:36px;border-radius:50%;border:1px solid currentColor;display:grid;place-items:center;position:relative;flex:none}
 .kc .bd2{position:absolute;top:-6px;right:-8px;min-width:18px;height:18px;border-radius:9px;background:#C0392B;color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
 .kc h3{font:700 15px/1.2 var(--sans);margin:8px 0 0}
@@ -126,7 +126,7 @@ main{padding:18px 14px 150px}
 .rem .lk{font-size:12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:6px 10px;white-space:nowrap}
 .mn{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .mt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 4px;display:flex;flex-direction:column;align-items:center;gap:6px;font:inherit;font-size:12px;color:var(--ink);cursor:pointer;min-height:76px}
-.qt{margin-top:16px;padding:14px 16px;border-radius:16px;background:var(--navy);color:var(--on);font:italic 15px/1.4 Georgia,serif}
+.qt{margin-top:16px;padding:14px 16px;border-radius:16px;background:var(--navy);color:var(--on);font:500 14px/1.5 var(--sans)}
 .qt small{display:block;margin-top:6px;font:500 10px var(--sans);letter-spacing:.2em;color:var(--acc)}
 .card.cur{border-color:var(--gold);border-left-color:var(--gold)}
 .fab{position:fixed;right:18px;bottom:calc(86px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;border:0;background:var(--gold);color:#101D35;display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.28);cursor:pointer;z-index:35}
@@ -134,6 +134,9 @@ body[data-v="form"] .fab,body[data-v="inv"] .fab,body[data-v="login"] .fab{displ
 nav{grid-template-columns:repeat(5,1fr);background:var(--hd);border-top:1px solid var(--edge);border-radius:20px 20px 0 0}
 nav button{color:var(--on2);min-height:52px}
 nav button.on{background:rgba(255,255,255,.1);color:var(--acc);box-shadow:none}
+h1,h2,h3{letter-spacing:-.01em}
+.hello h1{font-weight:700;font-size:25px;letter-spacing:-.02em}
+.hello p{font-size:14px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -234,11 +237,11 @@ function renderHome(){
  const chip=f?(d<0?'Terlambat '+(-d)+' hari':d===0?'Hari ini':d+' hari lagi'):'';
  const wk=orders.filter(o=>o.masuk&&o.masuk>=day(-7)).length,tdy=wd.filter(o=>o.deadline===day(0)).length,late=wd.filter(o=>o.deadline<day(0)).length,rev=orders.filter(o=>o.status==='Revisi').length;
  const parts=[tdy&&tdy+' deadline hari ini',late&&late+' terlambat',rev&&rev+' revisi'].filter(Boolean);
- $('#v-home').innerHTML=`<div class="hello"><small>Assalamu’alaikum,</small><h1>Selamat bekerja <span style="color:var(--gold)">✦</span></h1><p>Semoga setiap pesanan menjadi amal jariyah yang membawa keberkahan.</p></div>
+ $('#v-home').innerHTML=`<div class="hello"><h1>Semangat berkarya</h1><p>Insyaallah setiap pesanan mendatangkan keberkahan yang melimpah.</p></div>
  <button class="dt" data-go="deadline">${IC(P.cal)}<span><b>${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</b><br><span class="mute">Ketuk untuk lihat deadline ›</span></span></button>
  <div class="k3">
  <button class="kc a" data-go="deadline"><span class="ic">${IC(P.cal)}${urg?`<span class="bd2">${urg}</span>`:''}</span><h3>Deadline</h3><span class="s">${f?esc(f.nama):'Belum ada'}</span><div class="n">${wd.length}<small>aktif</small></div>${f?`<span class="pill">${chip}</span>`:''}<span class="go r"><span>Lihat semua</span><span>›</span></span></button>
- <button class="kc b" data-f="Semua"><span class="ic">${IC(P.doc)}</span><h3>Pesanan</h3><span class="s">Pesanan aktif</span><div class="n">${act.length}<small>aktif</small></div><span class="m">+${wk} minggu ini</span><span class="go r"><span>Lihat semua</span><span>›</span></span></button>
+ <button class="kc kb" data-f="Semua"><span class="ic">${IC(P.doc)}</span><h3>Pesanan</h3><span class="s">Pesanan aktif</span><div class="n">${act.length}<small>aktif</small></div><span class="m">+${wk} minggu ini</span><span class="go r"><span>Lihat semua</span><span>›</span></span></button>
  <button class="kc c" data-go="recap"><span class="ic">${IC(P.bar)}</span><h3>Rekap</h3><span class="s">Keuangan</span><div class="v">${rp(owed)}</div><span class="m">belum lunas</span><span class="go r"><span>Lihat detail</span><span>›</span></span></button></div>
  <button class="rem" data-go="deadline"><span class="ic">${IC(P.bell)}</span><span><b>Pengingat hari ini</b><br><span class="mute">${parts.length?parts.join(' • '):'Tidak ada pengingat hari ini'}</span></span><span class="lk">Lihat semua ›</span></button>
  <div class="r" style="margin:20px 0 10px"><b>Menu lainnya</b></div><div class="mn">${tiles()}</div>
