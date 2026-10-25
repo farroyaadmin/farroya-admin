@@ -140,27 +140,51 @@ h1,h2,h3{letter-spacing:-.01em}
 .crow{display:grid;grid-template-columns:1fr 92px auto auto;gap:6px;align-items:center;margin-bottom:8px}
 .crow input{padding:10px;min-width:0}
 .crow button{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+html:root[data-pal="1"]{--bg:#F4F2EC;--card:#FFFEFA;--line:#E3DFD5;--k1:#D9AD59;--k1t:#101D35;--k2:#FFFEFA;--k2t:#101D35;--k3:#E9EDF4;--k3t:#101D35}
+html:root[data-pal="2"]{--k1:#D9AD59;--k1t:#101D35;--k2:#243858;--k2t:#EEF1F6;--k3:#1B2D4B;--k3t:#EEF1F6}
+html:root[data-pal="3"]{--bg:#FFF8F4;--ink:#3F2428;--mute:#6F5256;--on:#3F2428;--on2:#5E4146;--k1:#F2A488;--k1t:#3B1D14;--k2:#FFFFFF;--k2t:#3F2428;--k3:#FBE3D8;--k3t:#3F2428}
+html:root[data-pal="4"]{color-scheme:light;--bg:#F2F5F0;--card:#FDFEFC;--ink:#12302C;--mute:#4F645F;--line:#DCE4DD;--navy:#134E4A;--hd:#134E4A;--on:#fff;--on2:#BFE3DC;--acc:#F4A07A;--edge:rgba(244,160,122,.65);--gold:#F08A5D;--silver:#D4E3DD;--goldtx:#A4491D;--blue:#2B6CB0;--ok:#2F7D58;--bad:#C0392B;--btn:#134E4A;--btnink:#fff;--focus:#134E4A;--k1:#F4A07A;--k1t:#3A1A0E;--k2:#FDFEFC;--k2t:#12302C;--k3:#E1EEE8;--k3t:#12302C}
+header{padding:10px 18px}
+.brand{font-size:21px}
+.vr{height:30px}
+main{padding:14px 14px 150px}
+.hello h1{font-size:22px}
+.hello p{font-size:13px;margin-top:2px}
+.dtl{display:flex;align-items:center;gap:6px;margin:8px 0 12px;font-size:13px;color:var(--mute)}
+.kc{min-height:196px}
+.kc.a{box-shadow:0 6px 16px rgba(0,0,0,.16)}
+.kc.a .s{font-weight:600;opacity:1;font-size:13px}
+.kc .s,.kc .m,.kc .go,.pill{font-size:12px}
+.kc.a .pill{background:rgba(0,0,0,.74);color:#fff}
+.kc .rw{display:flex;justify-content:space-between;font-size:12px;margin-top:3px}
+.kc .lb{display:block;font-size:12px;opacity:.8;margin-top:8px}
+.kc .v2{font:700 14px/1.25 var(--sans);overflow-wrap:anywhere}
+.kc .bd2{font-size:12px}
+.rem{margin-top:10px}
+.rem.warn .ic{background:var(--bad);color:#fff}
+.mt{min-height:68px;padding:10px 4px}
 </style>
 </head>
 <body>
 <header>
-  <div><div class="brand">FARROYA</div><div class="adm">ADMIN</div></div><span class="vr"></span><div class="tg">Farroya Arabic Design</div><button class="av" data-go="more" aria-label="Menu Lainnya">FA</button>
+  <div><div class="brand">FARROYA</div><div class="adm">ADMIN</div></div><span class="vr"></span><div class="tg">Farroya Arabic Design</div>
 </header>
 <main>
   <section id="v-home"></section>
   <section id="v-login" hidden>
-    <h1>Masuk</h1><p class="mute">Khusus admin Farroya. Gunakan email dan kata sandi yang sudah didaftarkan.</p>
+    <h1>Masuk</h1><p class="mute">Khusus admin Farroya.</p>
     <div class="fld" style="margin-top:16px"><label for="l_email">Email</label><input id="l_email" type="email" inputmode="email" autocomplete="username" autocapitalize="off"></div>
     <div class="fld"><label for="l_pw">Kata sandi</label><input id="l_pw" type="password" autocomplete="current-password"></div>
     <p class="err" id="lErr" role="alert"></p>
     <button class="btn" id="bLogin">Masuk</button>
-  </section>
+    </section>
   <section id="v-deadline" hidden></section>
   <section id="v-recap" hidden></section>
   <section id="v-more" hidden></section>
   <section id="v-cust" hidden></section>
   <section id="v-set" hidden></section>
   <section id="v-cat" hidden></section>
+  <section id="v-gcal" hidden></section>
   <section id="v-inv" hidden></section>
 
   <section id="v-list" hidden>
@@ -196,6 +220,8 @@ h1,h2,h3{letter-spacing:-.01em}
     <h3 class="sec">Jadwal dan status</h3>
     <div class="row2"><div class="fld"><label for="f_masuk">Tanggal masuk</label><input id="f_masuk" type="date"></div>
     <div class="fld"><label for="f_deadline">Deadline</label><input id="f_deadline" type="date"></div></div>
+    <div class="row2"><div class="fld"><label for="f_jam">Jam deadline (opsional)</label><input id="f_jam" type="time"></div><div></div></div>
+    <div id="calBox" class="note" style="margin:0 0 12px" hidden><b>Google Calendar:</b> <span id="calSt"></span><button class="btn ghost" id="bCal" type="button" style="margin-top:8px">Tambahkan ke Google Calendar</button></div>
     <div class="row2"><div class="fld"><label for="f_status">Status pengerjaan</label><select id="f_status"></select></div>
     <div class="fld"><label for="f_bayar">Status pembayaran</label><select id="f_bayar"></select></div></div>
     <h3 class="sec">Catatan dan file</h3>
@@ -225,7 +251,7 @@ const BAYAR=['Belum Bayar','DP','Lunas'];
 const KATALOG0={'Logo Arab':[['Paket Simple',25000],['Paket Spesial',75000],['Paket Istimewa',100000],['Paket Sempurna',150000],['Paket Kilat',200000],['Paket Filosofi',350000],['Paket Branding Kit',500000]],'Logo Wedding':[['Paket 50k',50000],['Paket 100k',100000],['Paket 150k',150000],['Paket 200k',200000],['Undangan Digital',350000]],'Kaligrafi':[['Paket 50k',50000],['Paket 100k',100000],['Paket 150k',150000],['Paket 200k',200000]]};
 let KATALOG=KATALOG0,JENIS=Object.keys(KATALOG);
 
-const F=['id','nama','wa','jenis','paket','harga','dp','masuk','deadline','admin','status','bayar','catatan','link'];
+const F=['id','nama','wa','jenis','paket','harga','dp','masuk','deadline','jam','admin','status','bayar','catatan','link'];
 const $=s=>document.querySelector(s);
 const rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -244,20 +270,21 @@ const P={cal:'M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0
 const tiles=()=>[['data-inv="1"','doc','Invoice'],['data-f="unpaid"','wal','Tagihan'],['data-go="cust"','usr','Pelanggan'],['data-go="set"','set','Pengaturan']].map(([a,i,t])=>`<button class="mt" ${a}>${IC(P[i],22)}${t}</button>`).join('');
 const dd=s=>Math.round((new Date(s+'T00:00:00')-new Date(day(0)+'T00:00:00'))/864e5);
 function renderHome(){
- const act=orders.filter(o=>!['Selesai','Batal'].includes(o.status)&&o.status!=='Batal'),wd=act.filter(o=>o.deadline).sort((a,b)=>a.deadline.localeCompare(b.deadline));
- const owed=orders.reduce((a,o)=>a+sisa(o),0),f=wd[0],d=f?dd(f.deadline):0,urg=wd.filter(o=>dd(o.deadline)<=2).length;
- const chip=f?(d<0?'Terlambat '+(-d)+' hari':d===0?'Hari ini':d+' hari lagi'):'';
- const wk=orders.filter(o=>o.status!=='Batal'&&o.masuk&&o.masuk>=day(-7)).length,tdy=wd.filter(o=>o.deadline===day(0)).length,late=wd.filter(o=>o.deadline<day(0)).length,rev=orders.filter(o=>o.status==='Revisi').length;
- const parts=[tdy&&tdy+' deadline hari ini',late&&late+' terlambat',rev&&rev+' revisi'].filter(Boolean);
- $('#v-home').innerHTML=`<div class="hello"><h1>Semangat berkarya</h1><p>Insyaallah setiap pesanan mendatangkan keberkahan yang melimpah.</p></div>
- <button class="dt" data-go="deadline">${IC(P.cal)}<span><b>${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</b><br><span class="mute">Ketuk untuk lihat deadline ›</span></span></button>
+ const live=orders.filter(o=>!['Selesai','Batal'].includes(o.status)),wd=live.filter(o=>o.deadline).sort((a,b)=>(a.deadline+(a.jam||'')).localeCompare(b.deadline+(b.jam||'')));
+ const owed=orders.reduce((a,o)=>a+sisa(o),0),f=wd[0],d=f?dd(f.deadline):0;
+ const late=wd.filter(o=>o.deadline<day(0)).length,tdy=wd.filter(o=>o.deadline===day(0)).length,tmr=wd.filter(o=>dd(o.deadline)===1).length,rev=orders.filter(o=>o.status==='Revisi').length;
+ const cnt=x=>orders.filter(o=>o.status===x).length,mk=day(0).slice(0,7),ids=new Set(orders.map(o=>o.id));
+ const inc=(typeof allPays!=='undefined'?allPays:[]).filter(p=>ids.has(p.order_id)&&String(p.tanggal||'').slice(0,7)===mk).reduce((a,p)=>a+(+p.jumlah||0),0);
+ const chip=f?(d<0?'Terlambat '+(-d)+' hari':d===0?'Hari ini':d===1?'Besok':d+' hari lagi'):'';
+ const sd=x=>new Date(x+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short'});
+ const parts=[late&&late+' terlambat',tdy&&tdy+' hari ini',tmr&&tmr+' besok',rev&&rev+' revisi'].filter(Boolean);
+ $('#v-home').innerHTML=`<div class="dtl" style="margin-top:2px">${IC(P.cal,16)}<span>${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</span></div>
  <div class="k3">
- <button class="kc a" data-go="deadline"><span class="ic">${IC(P.cal)}${urg?`<span class="bd2">${urg}</span>`:''}</span><h3>Deadline</h3><span class="s">${f?esc(f.nama):'Belum ada'}</span><div class="n">${wd.length}<small>aktif</small></div>${f?`<span class="pill">${chip}</span>`:''}<span class="go r"><span>Lihat semua</span><span>›</span></span></button>
- <button class="kc kb" data-f="Semua"><span class="ic">${IC(P.doc)}</span><h3>Pesanan</h3><span class="s">Pesanan aktif</span><div class="n">${act.length}<small>aktif</small></div><span class="m">+${wk} minggu ini</span><span class="go r"><span>Lihat semua</span><span>›</span></span></button>
- <button class="kc c" data-go="recap"><span class="ic">${IC(P.bar)}</span><h3>Rekap</h3><span class="s">Keuangan</span><div class="v">${rp(owed)}</div><span class="m">belum lunas</span><span class="go r"><span>Lihat detail</span><span>›</span></span></button></div>
- <button class="rem" data-go="deadline"><span class="ic">${IC(P.bell)}</span><span><b>Pengingat hari ini</b><br><span class="mute">${parts.length?parts.join(' • '):'Tidak ada pengingat hari ini'}</span></span><span class="lk">Lihat semua ›</span></button>
- <div class="r" style="margin:20px 0 10px"><b>Menu lainnya</b></div><div class="mn">${tiles()}</div>
- <div class="qt">“Setiap desain adalah doa, setiap pesanan adalah amanah.”<small>FARROYA ARABIC DESIGN</small></div>`;
+ <button class="kc a" data-go="deadline"><span class="ic">${IC(P.cal)}${late+tdy?`<span class="bd2">${late+tdy}</span>`:''}</span><h3>Deadline</h3><span class="s">${f?esc(f.nama):'Belum ada deadline'}</span><div class="n">${f?sd(f.deadline):'-'}</div>${f&&f.jam?`<span class="m">Pukul ${esc(String(f.jam).replace(':','.'))}</span>`:''}${f?`<span class="pill">${chip}</span>`:''}<span class="m">${wd.length} deadline aktif</span><span class="go r"><span>Lihat semua</span><span>›</span></span></button>
+ <button class="kc kb" data-f="Semua"><span class="ic">${IC(P.doc)}</span><h3>Pesanan</h3><div class="n">${live.length}<small>aktif</small></div><div class="rw"><span>Baru</span><b>${cnt('Baru')}</b></div><div class="rw"><span>Proses</span><b>${cnt('Dalam Proses')}</b></div><div class="rw"><span>Revisi</span><b>${cnt('Revisi')}</b></div><span class="go r"><span>Lihat semua</span><span>›</span></span></button>
+ <button class="kc c" data-go="recap"><span class="ic">${IC(P.bar)}</span><h3>Rekap</h3><span class="lb">Uang masuk bulan ini</span><div class="v2">${rp(inc)}</div><span class="lb">Belum lunas</span><div class="v2">${rp(owed)}</div><span class="go r"><span>Lihat detail</span><span>›</span></span></button></div>
+ <button class="rem${late||tdy?' warn':''}" data-go="deadline"><span class="ic">${IC(P.bell)}</span><span><b>Pengingat</b><br><span class="mute">${parts.length?parts.join(' • '):'Semua deadline aman'}</span></span><span class="lk">Lihat semua ›</span></button>
+ <div class="r" style="margin:18px 0 10px"><b>Menu lainnya</b></div><div class="mn">${tiles()}</div>`;
 }
 function renderDeadline(){
  const act=orders.filter(o=>!['Selesai','Batal'].includes(o.status)&&o.status!=='Batal'&&o.deadline).sort((a,b)=>a.deadline.localeCompare(b.deadline));
@@ -271,8 +298,8 @@ function renderCust(){
  $('#v-cust').innerHTML='<h1>Pelanggan</h1><div class="mute">'+r.length+' pelanggan, dihitung dari data pesanan.</div><div style="margin-top:12px">'+(r.map(c=>`<div class="card"><div class="r"><b>${esc(c.nama)}</b><span class="mute">${c.n} pesanan</span></div><div class="r"><span class="mute">${esc(c.wa||'Tanpa WhatsApp')}</span><b>${rp(c.v)}</b></div></div>`).join('')||'<p class="mute empty">Belum ada pelanggan.</p>')+'</div>';
 }
 function renderSet(){
- const T=[['1','Terang','Latar krem lembut, kartu putih'],['2','Gelap','Navy dengan teks silver'],['3','Peach','Peach dan rose gold']],cur=document.documentElement.dataset.pal;
- $('#v-set').innerHTML=`<h1>Pengaturan</h1><h2>Tema warna</h2>${T.map(([k,n,x])=>`<button class="card${cur===k?' cur':''}" data-pal="${k}"><div class="r"><b>${n}</b><span class="mute">${cur===k?'Dipakai':''}</span></div><div class="mute">${x}</div></button>`).join('')}<h2>Data dan harga</h2><button class="card" data-go="cat"><div class="r"><b>Harga paket</b><span class="mute">›</span></div><div class="mute">Ubah daftar jenis, paket, dan harga</div></button><button class="card" data-exp="orders"><div class="r"><b>Ekspor pesanan (CSV)</b><span class="mute">↓</span></div><div class="mute">Cadangan semua pesanan, bisa dibuka di Excel</div></button><button class="card" data-exp="pays"><div class="r"><b>Ekspor pembayaran (CSV)</b><span class="mute">↓</span></div><div class="mute">Riwayat semua pembayaran. Simpan cadangan sebulan sekali.</div></button><h2>Akun</h2><div class="note" style="margin-top:0">Data online dan terlihat oleh semua admin yang login. Masuk sebagai <b>${esc(userEmail)}</b>.</div><button class="btn ghost" id="bOut">Keluar dari akun</button>`;
+ const T=[['1','Terang','Latar krem lembut, kartu putih'],['2','Gelap','Navy dengan teks silver'],['3','Peach','Peach dan rose gold'],['4','Sage','Hijau teal tenang dan coral semangat']],cur=document.documentElement.dataset.pal;
+ $('#v-set').innerHTML=`<h1>Pengaturan</h1><h2>Tema warna</h2>${T.map(([k,n,x])=>`<button class="card${cur===k?' cur':''}" data-pal="${k}"><div class="r"><b>${n}</b><span class="mute">${cur===k?'Dipakai':''}</span></div><div class="mute">${x}</div></button>`).join('')}<h2>Data dan harga</h2><button class="card" data-go="cat"><div class="r"><b>Harga paket</b><span class="mute">›</span></div><div class="mute">Ubah daftar jenis, paket, dan harga</div></button><button class="card" data-exp="orders"><div class="r"><b>Ekspor pesanan (CSV)</b><span class="mute">↓</span></div><div class="mute">Cadangan semua pesanan, bisa dibuka di Excel</div></button><button class="card" data-exp="pays"><div class="r"><b>Ekspor pembayaran (CSV)</b><span class="mute">↓</span></div><div class="mute">Riwayat semua pembayaran. Simpan cadangan sebulan sekali.</div></button><button class="card" data-go="gcal"><div class="r"><b>Google Calendar</b><span class="mute">${calUrl?'Tersambung':'Belum tersambung'}</span></div><div class="mute">Deadline pesanan masuk ke kalender</div></button><h2>Akun</h2><div class="note" style="margin-top:0">Data online dan terlihat oleh semua admin yang login. Masuk sebagai <b>${esc(userEmail)}</b>.</div><button class="btn ghost" id="bOut">Keluar dari akun</button>`;
 }
 function renderList(){
  const ch=[['Semua','Semua'],['Baru','Baru'],['Dalam Proses','Dalam Proses'],['Revisi','Revisi'],['Selesai','Selesai'],['Batal','Batal'],['unpaid','Belum lunas']];
@@ -282,14 +309,14 @@ function renderList(){
  $('#res').innerHTML=r.length?r.map(card).join(''):'<p class="mute empty">Tidak ada pesanan yang cocok. Ubah kata kunci atau pilih filter lain.</p>';
  $('#count').textContent=invMode?'Pilih pesanan untuk dibuatkan invoice':r.length+' pesanan';
 }
-const VIEWS=['home','deadline','list','recap','more','cust','set','cat','form','inv','login'];
+const VIEWS=['home','deadline','list','recap','more','cust','set','cat','gcal','form','inv','login'];
 function go(v){
  view=v;if(v!=='list')invMode=false;
  document.body.classList.toggle('out',v==='login');document.body.dataset.v=v;
  VIEWS.forEach(k=>$('#v-'+k).hidden=k!==v);
- const nk={cust:'more',set:'more',cat:'more',inv:'more',form:'list'}[v]||v;
+ const nk={cust:'more',set:'more',cat:'more',gcal:'more',inv:'more',form:'list'}[v]||v;
  document.querySelectorAll('nav button[id]').forEach(b=>b.classList.toggle('on',b.id==='n-'+nk));
- const R={home:renderHome,deadline:renderDeadline,recap:renderRecap,more:renderMore,cust:renderCust,set:renderSet,cat:renderCat,list:()=>{$('#q').value=q;renderList()}};
+ const R={home:renderHome,deadline:renderDeadline,recap:renderRecap,more:renderMore,cust:renderCust,set:renderSet,cat:renderCat,gcal:renderGcal,list:()=>{$('#q').value=q;renderList()}};
  if(R[v])R[v]();
  window.scrollTo(0,0);
 }
@@ -307,7 +334,7 @@ function openForm(id){
  sel('#f_jenis',o.jenis);$('#f_jenis').value=o.jenis;fillPaket();sel('#f_paket',o.paket);F.forEach(k=>$('#f_'+k).value=o[k]??'');
  $('#f_dp').readOnly=!!id;$('label[for=f_dp]').textContent=id?'Sudah dibayar (Rp)':'DP (Rp)';$('#payBox').hidden=!id;$('#p_tgl').value=day(0);$('#pErr').textContent='';pays=[];if(id)loadPays(id);
  $('#fTitle').textContent=id?'Edit pesanan':'Tambah pesanan';
- $('#err').textContent='';calc(false);
+ $('#err').textContent='';calc(false);$('#calBox').hidden=!id;if(id)calBox(o);
  const w=String(o.wa||'').replace(/\D/g,'').replace(/^0/,'62');
  $('#bWa').hidden=!id||!w;$('#bWa').href='https://wa.me/'+w;$('#bDel').hidden=!id;$('#bInv').hidden=!id;
  go('form');
@@ -330,13 +357,16 @@ async function saveForm(){
   if(r.error)throw r.error;
   if(!edit&&o.dp>0){const pr=await sb.from('payments').insert({order_id:o.id,tanggal:o.masuk||day(0),jumlah:o.dp,catatan:'DP awal'});if(pr.error)throw new Error('Pesanan tersimpan, tetapi pembayaran gagal dicatat: '+pr.error.message)}
   await loadOrders();toast('Pesanan disimpan');q='';flt='Semua';go('list');
+  calSync(o.id,true).then(async ok=>{if(calUrl){await loadOrders();toast(ok?'Tersinkron ke Google Calendar':'Sinkron kalender gagal, coba dari detail pesanan');if(view==='list')renderList()}});
  }catch(x){$('#err').textContent='Gagal menyimpan: '+((x&&x.message)||'coba lagi')}
  b.disabled=false;
 }
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-go],[data-f],[data-chip],[data-edit],[data-new],[data-per],#bReset,#bSave,#bDel,#bInv,#bPdf,#bLogin,#bOut,[data-pal],[data-inv],#bPay,[data-delpay],[data-csave],[data-cdel],#bCatAdd,#bExpRekap,[data-exp]');if(!t)return;
+ const t=e.target.closest('[data-go],[data-f],[data-chip],[data-edit],[data-new],[data-per],#bReset,#bSave,#bDel,#bInv,#bPdf,#bLogin,#bOut,[data-pal],[data-inv],#bPay,#bCal,[data-cal],[data-delpay],[data-csave],[data-cdel],#bCatAdd,#bExpRekap,[data-exp]');if(!t)return;
  if(t.id==='bSave')return saveForm();
  if(t.id==='bPay')return addPay();
+ if(t.id==='bCal')return calBtn();
+ if(t.dataset.cal)return calAct(t.dataset.cal);
  if(t.dataset.delpay)return twoTap(t,'Tap lagi',()=>delPay(t.dataset.delpay));
  if(t.dataset.csave)return saveCat(t.dataset.csave);
  if(t.dataset.cdel)return twoTap(t,'Tap lagi',()=>delCat(t.dataset.cdel));
@@ -387,7 +417,7 @@ function renderRecap(){
 function showInv(id){
  const o=orders.find(x=>x.id===id);if(!o)return;inv=id;
  $('#v-inv').innerHTML=`<h1>Invoice</h1><p class="mute">Bukti pesanan untuk pelanggan. Cek dulu, lalu unduh.</p>
- <div class="paper"><div class="ph">FARROYA ARABIC DESIGN</div><div class="pn">${invNo(o)}</div>${invLines(o).map(([a,b])=>`<div class="r"><span class="mute">${a}</span><b>${esc(b)}</b></div>`).join('')}<p class="mute">Pesanan Anda sudah tercatat di sistem kami. Simpan invoice ini sebagai bukti.</p></div>
+ <div class="paper"><div class="ph">FARROYA ARABIC DESIGN</div><div class="pn">${invNo(o)}</div>${invLines(o).map(([a,b])=>`<div class="r"><span class="mute">${a}</span><b>${esc(b)}</b></div>`).join('')}<p class="mute">Pesanan Anda sudah tercatat di sistem kami. Simpan invoice ini sebagai bukti.</p><p class="mute" style="margin-top:0"><i>Setiap logo adalah doa. Terima kasih telah mempercayakan karya Anda kepada Farroya.</i></p></div>
  <button class="btn" id="bPdf">Unduh invoice (PDF)</button><p class="err" id="iErr" role="alert"></p>
  <button class="btn ghost" data-edit="${esc(id)}">Kembali ke pesanan</button>`;
  go('inv');
@@ -402,7 +432,7 @@ async function pdf(){
   p.setFont('helvetica','normal');p.setFontSize(10);p.setTextColor(195,202,213);p.text('Invoice / Bukti Pesanan   '+invNo(o),15,26);
   let y=52;
   invLines(o).forEach(([a,b])=>{p.setFont('helvetica','normal');p.setFontSize(10);p.setTextColor(91,103,125);p.text(a,15,y);p.setFont('helvetica','bold');p.setTextColor(14,27,51);p.text(String(b),80,y);p.setDrawColor(213,218,226);p.line(15,y+3,195,y+3);y+=10});
-  p.setFont('helvetica','normal');p.setTextColor(91,103,125);p.text('Pesanan Anda sudah tercatat di sistem Farroya Arabic Design. Terima kasih.',15,y+8);
+  p.setFont('helvetica','normal');p.setTextColor(91,103,125);p.text('Pesanan Anda sudah tercatat di sistem Farroya Arabic Design. Terima kasih.',15,y+8);p.setFont('helvetica','italic');p.text('Setiap logo adalah doa. Terima kasih telah mempercayakan karya Anda kepada Farroya.',15,y+16);
   const fn='Invoice-'+invNo(o)+'.pdf';if(d)await d.save({filename:fn,data:p.output('arraybuffer')});else p.save(fn);
  }catch(x){if(!x||x.code!=='declined')e.textContent='Gagal membuat PDF. Coba lagi, atau gunakan screenshot invoice.'}
 }
@@ -416,7 +446,7 @@ $('#f_paket').addEventListener('change',pickPaket);
 const opt=(id,a)=>$(id).innerHTML=a.map(x=>`<option>${esc(x)}</option>`).join('');
 opt('#f_jenis',JENIS);fillPaket();opt('#f_status',STATUS);opt('#f_bayar',BAYAR);
 const PK='farroya_tema_v2';
-function setPal(n,keep){n=['1','2','3'].includes(n)?n:'1';document.documentElement.dataset.pal=n;if(keep)try{localStorage.setItem(PK,n)}catch(e){}}
+function setPal(n,keep){n=['1','2','3','4'].includes(n)?n:'1';document.documentElement.dataset.pal=n;if(keep)try{localStorage.setItem(PK,n)}catch(e){}}
 let pal0='1';try{pal0=localStorage.getItem(PK)||'1'}catch(e){}
 setPal(pal0);
 let pays=[],allPays=[],cat=[],lastRekap=[];
@@ -464,7 +494,7 @@ const SB_URL='https://xbnpvtwvmnkhiymolorv.supabase.co',SB_KEY='sb_publishable_B
 const sb=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
 async function loadOrders(){const[a,b]=await Promise.all([sb.from('orders').select('*'),sb.from('payments').select('*')]);if(a.error){toast('Gagal memuat data');return false}orders=a.data||[];allPays=b.error?[]:(b.data||[]);return true}
 async function refresh(){if(!authed)return;await loadOrders();if(view==='home')renderHome();else if(view==='list')renderList();else if(view==='recap')renderRecap();else if(view==='deadline')renderDeadline();else if(view==='cust')renderCust()}
-async function enter(s){userEmail=s.user.email||'';authed=true;await Promise.all([loadOrders(),loadCatalog()]);go('home')}
+async function enter(s){userEmail=s.user.email||'';authed=true;await Promise.all([loadOrders(),loadCatalog(),loadCfg()]);go('home');{const h=decodeURIComponent(location.hash.slice(1));if(h&&orders.some(o=>o.id===h))openForm(h)}}
 async function doLogin(){
  if(!sb)return;
  const em=$('#l_email').value.trim(),pw=$('#l_pw').value,e=$('#lErr');e.textContent='';
@@ -475,7 +505,54 @@ async function doLogin(){
  if(error){e.textContent=error.status===400?'Email atau kata sandi salah.':'Tidak bisa masuk: '+error.message;return}
  $('#l_pw').value='';await enter(data.session);
 }
-async function delOrder(id){await sb.from('payments').delete().eq('order_id',id);const{error}=await sb.from('orders').delete().eq('id',id);if(error){toast('Gagal menghapus');return}await loadOrders();toast('Pesanan dihapus');go('list')}
+async function delOrder(id){await calSync(id,true,true);await sb.from('payments').delete().eq('order_id',id);const{error}=await sb.from('orders').delete().eq('id',id);if(error){toast('Gagal menghapus');return}await loadOrders();toast('Pesanan dihapus');go('list')}
+let calUrl='';
+const calLabel=o=>!o.deadline?'Belum ada tanggal deadline':o.cal_status==='ok'?'Berhasil':o.cal_status==='gagal'?'Gagal':o.cal_status==='hapus'?'Acara dihapus dari kalender':'Belum disinkronkan';
+async function loadCfg(){const r=await sb.from('app_config').select('*').eq('key','cal_url');calUrl=(!r.error&&r.data&&r.data[0]&&r.data[0].value)||''}
+function calBox(o){$('#calSt').textContent=calLabel(o)+(o.cal_at&&o.cal_status==='ok'?' ('+new Date(o.cal_at).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+')':'');$('#bCal').textContent=calUrl&&o.cal_event?'Sinkronkan ulang ke Google Calendar':'Tambahkan ke Google Calendar'}
+const calTpl=o=>{const p2=n=>String(n).padStart(2,'0'),d=o.deadline.replace(/-/g,'');let dt;
+ if(o.jam){const e=new Date(o.deadline+'T'+o.jam+':00');e.setMinutes(e.getMinutes()+30);dt=d+'T'+o.jam.replace(':','')+'00/'+e.getFullYear()+p2(e.getMonth()+1)+p2(e.getDate())+'T'+p2(e.getHours())+p2(e.getMinutes())+'00'}
+ else{const e=new Date(o.deadline+'T00:00:00');e.setDate(e.getDate()+1);dt=d+'/'+ymd(e).replace(/-/g,'')}
+ return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('[FARROYA DEADLINE] '+o.nama+' — '+o.jenis)+'&dates='+dt+'&details='+encodeURIComponent('ID pesanan: '+o.id+'\n'+(o.catatan||'')+'\n'+location.origin+location.pathname+'#'+o.id)};
+async function calCall(body){
+ const{data}=await sb.auth.getSession();
+ const res=await fetch(calUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:data.session.access_token,site:location.origin+location.pathname,...body})});
+ const j=await res.json();if(!j.ok)throw new Error(j.error||'Gagal');return j;
+}
+async function calSync(id,silent,force){
+ const o=orders.find(x=>x.id===id);if(!o||!calUrl)return false;
+ const del=!!force||o.status==='Batal'||!o.deadline;if(del&&!o.cal_event)return true;
+ try{
+  const j=await calCall({action:del?'delete':'upsert',id:o.id,eventId:o.cal_event||'',nama:o.nama,jenis:o.jenis,paket:o.paket,date:o.deadline,time:o.jam||'',catatan:o.catatan||'',link:o.link||'',done:o.status==='Selesai'});
+  await sb.from('orders').update({cal_event:j.eventId||'',cal_status:del?'hapus':'ok',cal_at:new Date().toISOString()}).eq('id',id);return true;
+ }catch(x){await sb.from('orders').update({cal_status:'gagal'}).eq('id',id);if(!silent)toast('Sinkron kalender gagal: '+(x.message||''));return false}
+}
+async function calBtn(){
+ const o=orders.find(x=>x.id===edit);if(!o)return;
+ if(!o.deadline){toast('Isi tanggal deadline, simpan, lalu coba lagi');return}
+ if(!calUrl){window.open(calTpl(o),'_blank');return}
+ const b=$('#bCal');b.disabled=true;b.textContent='Menyinkronkan...';
+ const ok=await calSync(edit);await loadOrders();const n=orders.find(x=>x.id===edit);if(n)calBox(n);b.disabled=false;if(ok)toast('Tersinkron ke Google Calendar');
+}
+function renderGcal(){
+ const w=orders.filter(o=>o.deadline&&!['Selesai','Batal'].includes(o.status)),ok=w.filter(o=>o.cal_status==='ok').length,bad=w.filter(o=>o.cal_status==='gagal').length;
+ $('#v-gcal').innerHTML=`<h1>Google Calendar</h1><div class="mute">Menyambungkan website ke kalender Farroya Deadline lewat jembatan Apps Script.</div><div class="fld" style="margin-top:14px"><label for="cal_url">Alamat jembatan (Web app URL)</label><input id="cal_url" type="url" inputmode="url" autocapitalize="off" placeholder="https://script.google.com/macros/s/.../exec" value="${esc(calUrl)}"></div><p class="err" id="gErr" role="alert"></p><button class="btn" data-cal="save">Simpan alamat</button><button class="btn ghost" data-cal="test">Tes koneksi</button><button class="btn ghost" data-cal="all">Sinkronkan semua deadline aktif</button><div class="note">Deadline aktif: ${w.length}. Berhasil: ${ok}. Gagal: ${bad}. Belum disinkronkan: ${w.length-ok-bad}.</div>`;
+}
+async function calAct(a){
+ const e=$('#gErr');e.textContent='';e.style.color='';
+ if(a==='save'){
+  const v=$('#cal_url').value.trim();
+  if(v&&!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(v)){e.textContent='Alamat harus diawali https://script.google.com/macros/s/ dan diakhiri /exec';return}
+  const r=await sb.from('app_config').upsert({key:'cal_url',value:v});
+  if(r.error){e.textContent='Gagal menyimpan: '+r.error.message;return}
+  calUrl=v;toast('Alamat disimpan');return renderGcal();
+ }
+ if(!calUrl){e.textContent='Simpan alamat jembatan dulu.';return}
+ if(a==='test'){try{const j=await calCall({action:'ping'});e.style.color='var(--ok)';e.textContent='Terhubung ke kalender: '+j.name}catch(x){e.textContent='Gagal terhubung: '+x.message}return}
+ const t=orders.filter(o=>o.deadline&&!['Selesai','Batal'].includes(o.status)&&o.cal_status!=='ok');let n=0;
+ for(let i=0;i<t.length;i++){toast('Menyinkronkan '+(i+1)+' dari '+t.length);if(await calSync(t[i].id,true))n++;await loadOrders()}
+ renderGcal();toast(t.length?n+' dari '+t.length+' berhasil disinkronkan':'Semua sudah tersinkron');
+}
 async function boot(){
  if(!sb){go('login');$('#lErr').textContent='Layanan data gagal dimuat. Periksa internet, lalu muat ulang halaman.';return}
  sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'){authed=false;orders=[];go('login')}});
