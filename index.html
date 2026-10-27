@@ -311,23 +311,27 @@ nav button.on::before{content:"";position:absolute;left:28%;right:28%;bottom:1px
     <div class="row2"><div class="fld"><label for="f_tipe">Tipe pesanan</label><select id="f_tipe"><option>Reguler</option><option>Kilat</option></select></div><div class="fld"><label for="f_jam_masuk">Jam order</label><input id="f_jam_masuk" type="time"></div></div>
     <div id="kilatBox" hidden><div class="row2"><div class="fld"><label for="f_mulai">Mulai pengerjaan</label><input id="f_mulai" type="date"></div><div class="fld"><label for="f_mulai_jam">Jam mulai</label><input id="f_mulai_jam" type="time"></div></div><p class="mute">Paket kilat ditargetkan selesai 1 × 24 jam. Deadline yang Anda isi di bawah tetap menjadi acuan.</p></div>
     <div class="row2"><div class="fld"><label for="f_harga">Harga (Rp)</label><input id="f_harga" type="number" inputmode="numeric" min="0"></div>
-    <div class="fld"><label for="f_dp">DP (Rp)</label><input id="f_dp" type="number" inputmode="numeric" min="0"></div></div>
-    <div class="fld"><label>Sisa pembayaran</label><div class="calc" id="sisa">Rp0</div></div>
+    <div class="fld"><label for="f_bayar">Pembayaran</label><select id="f_bayar"></select></div></div>
+    <div class="fld" id="dpBox"><label for="f_dp">Jumlah DP (Rp)</label><input id="f_dp" type="number" inputmode="numeric" min="0"></div>
+    <div class="fld" id="sisaBox"><label>Sisa pembayaran</label><div class="calc" id="sisa">Rp0</div></div>
     <div id="payBox" hidden>
     <h3 class="sec">Riwayat pembayaran</h3>
     <div id="payList"></div>
+    <div id="payDone" class="note" style="margin:0 0 8px" hidden>Pesanan ini sudah lunas.</div>
+    <div id="payNew">
+    <div class="fld"><label for="p_jenis">Jenis pembayaran</label><select id="p_jenis"></select></div>
     <div class="row2"><div class="fld"><label for="p_jumlah">Jumlah (Rp)</label><input id="p_jumlah" type="number" inputmode="numeric" min="0"></div><div class="fld"><label for="p_tgl">Tanggal bayar</label><input id="p_tgl" type="date"></div></div>
-    <div class="fld"><label for="p_cat">Catatan pembayaran (opsional)</label><input id="p_cat" placeholder="Misal: pelunasan, transfer BCA" autocomplete="off"></div>
+    <div class="fld"><label for="p_cat">Catatan pembayaran (opsional)</label><input id="p_cat" placeholder="Misal: transfer BCA" autocomplete="off"></div>
     <p class="err" id="pErr" role="alert"></p>
-    <button class="btn ghost" id="bPay">Tambah pembayaran</button>
+    <button class="btn ghost" id="bPay">Catat pembayaran</button>
+    </div>
     </div>
     <h3 class="sec">Jadwal dan status</h3>
     <div class="row2"><div class="fld"><label for="f_masuk">Tanggal masuk</label><input id="f_masuk" type="date"></div>
     <div class="fld"><label for="f_deadline">Deadline</label><input id="f_deadline" type="date"></div></div>
     <div class="row2"><div class="fld"><label for="f_jam">Jam deadline (opsional)</label><input id="f_jam" type="time"></div><div></div></div>
     <div id="calBox" class="note" style="margin:0 0 12px" hidden><b>Google Calendar:</b> <span id="calSt"></span><button class="btn ghost" id="bCal" type="button" style="margin-top:8px">Tambahkan ke Google Calendar</button></div>
-    <div class="row2"><div class="fld"><label for="f_status">Status pengerjaan</label><select id="f_status"></select></div>
-    <div class="fld"><label for="f_bayar">Status pembayaran</label><select id="f_bayar"></select></div></div>
+    <div class="row2"><div class="fld"><label for="f_status">Status pengerjaan</label><select id="f_status"></select></div><div></div></div>
     <h3 class="sec">Catatan dan file</h3>
     <div class="fld"><label for="f_catatan">Catatan</label><textarea id="f_catatan"></textarea></div>
     <div class="fld"><label for="f_link">Link file</label><input id="f_link" type="url" inputmode="url" placeholder="https://"></div>
@@ -460,18 +464,41 @@ function go(v){
 function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2200)}
 function nextId(){const n=orders.reduce((a,o)=>Math.max(a,parseInt(String(o.id).replace(/\D/g,''))||0),0)+1;return 'FAR-'+String(n).padStart(3,'0')}
 function calc(auto){
- const h=+$('#f_harga').value||0,d=+$('#f_dp').value||0;
- $('#sisa').textContent=rp(Math.max(0,h-d));
- if(auto&&(h>0||d>0))$('#f_bayar').value=d<=0?'Belum Bayar':d>=h?'Lunas':'DP';
+ const h=+$('#f_harga').value||0;
+ if(!edit&&$('#f_bayar').value==='Lunas')$('#f_dp').value=h;
+ const d=+$('#f_dp').value||0,left=Math.max(0,h-d);
+ $('#sisa').textContent=rp(left);$('#sisaBox').hidden=h>0&&left<=0;
+ if(edit&&auto&&(h>0||d>0))$('#f_bayar').value=d<=0?'Belum Bayar':d>=h?'Lunas':'DP';
+}
+function bayarTog(){
+ const v=$('#f_bayar').value,dp=$('#f_dp'),h=+$('#f_harga').value||0;
+ if(edit){$('#dpBox').hidden=false;calc(false);return}
+ $('#dpBox').hidden=v==='Belum Bayar';
+ if(v==='Lunas'){dp.value=h;dp.readOnly=true;$('label[for=f_dp]').textContent='Jumlah dibayar (Rp)'}
+ else if(v==='DP'){dp.readOnly=false;if((+dp.value||0)>=h)dp.value='';$('label[for=f_dp]').textContent='Jumlah DP (Rp)'}
+ else{dp.value=0;dp.readOnly=true}
+ calc(false);
+}
+function payJenis(){
+ const v=$('#p_jenis').value,j=$('#p_jumlah'),h=+$('#f_harga').value||0,d=+$('#f_dp').value||0,lunas=v==='Lunas';
+ j.readOnly=lunas;if(lunas){j.value=Math.max(0,h-d);j.dataset.auto='1'}else if(j.dataset.auto==='1'){j.value='';j.dataset.auto=''}
+ $('label[for=p_jumlah]').textContent=lunas?'Jumlah pelunasan (Rp)':'Jumlah '+(v==='DP'?'DP':'cicilan')+' (Rp)';
+}
+function payRefresh(){
+ if(!edit)return;
+ const h=+$('#f_harga').value||0,d=+$('#f_dp').value||0,left=Math.max(0,h-d),first=!pays.some(p=>(+p.jumlah||0)>0);
+ $('#payNew').hidden=h>0&&left<=0;$('#payDone').hidden=!(h>0&&left<=0);
+ const sel=$('#p_jenis'),cur=sel.value,o=first?['DP','Lunas']:['Cicilan','Lunas'];
+ sel.innerHTML=o.map(x=>`<option>${x}</option>`).join('');sel.value=o.includes(cur)?cur:o[0];payJenis();
 }
 function openForm(id){
  edit=id||null;
  const o=id?orders.find(x=>x.id===id):{id:nextId(),nama:'',wa:'',jenis:JENIS[0],paket:KATALOG[JENIS[0]][0][0],harga:KATALOG[JENIS[0]][0][1],dp:'',masuk:day(0),deadline:day(7),admin:'Fauziah',status:'Antrian',bayar:'Belum Bayar',catatan:'',link:'',logo:'',tipe:'Reguler',jam_masuk:NOW_J().slice(11),mulai:'',mulai_jam:''};
  const sel=(i,v)=>{const e=$(i);if(v&&![...e.options].some(x=>x.value===v))e.add(new Option(v,v))};
  sel('#f_jenis',o.jenis);$('#f_jenis').value=o.jenis;fillPaket();sel('#f_paket',o.paket);F.forEach(k=>$('#f_'+k).value=o[k]??'');
- $('#f_dp').readOnly=!!id;$('label[for=f_dp]').textContent=id?'Sudah dibayar (Rp)':'DP (Rp)';$('#payBox').hidden=!id;$('#p_tgl').value=day(0);$('#pErr').textContent='';pays=[];if(id)loadPays(id);
+ $('#f_dp').readOnly=!!id;$('label[for=f_dp]').textContent=id?'Sudah dibayar (Rp)':'Jumlah DP (Rp)';$('#f_bayar').disabled=!!id;$('#payBox').hidden=!id;$('#p_tgl').value=day(0);$('#pErr').textContent='';pays=[];if(id)loadPays(id);
  $('#fTitle').textContent=id?'Edit pesanan':'Tambah pesanan';
- $('#err').textContent='';calc(false);kilatTog();waHint();$('#calBox').hidden=!id;if(id)calBox(o);
+ $('#err').textContent='';bayarTog();kilatTog();waHint();$('#calBox').hidden=!id;if(id)calBox(o);
  const w=String(o.wa||'').replace(/\D/g,'').replace(/^0/,'62');
  $('#bWa').hidden=!id||!w;$('#bWa').href='https://wa.me/'+w;$('#bDel').hidden=!id;$('#bInv').hidden=!id;
  go('form');
@@ -485,14 +512,15 @@ async function saveForm(){
  const o={};F.forEach(k=>o[k]=$('#f_'+k).value.trim());
  o.harga=+o.harga||0;o.dp=+o.dp||0;
  if(!o.nama){$('#err').textContent='Nama pelanggan wajib diisi.';$('#f_nama').focus();return}
- if(o.dp>o.harga){$('#err').textContent='DP tidak boleh lebih besar dari harga.';$('#f_dp').focus();return}
+ if(o.dp>o.harga){$('#err').textContent='Jumlah pembayaran tidak boleh lebih besar dari harga.';$('#f_dp').focus();return}
+ if(!edit&&o.bayar==='DP'&&o.dp<=0){$('#err').textContent='Isi jumlah DP, atau pilih Belum Bayar.';$('#f_dp').focus();return}
  const b=$('#bSave');b.disabled=true;
  try{
   let r;
   if(edit)r=await sb.from('orders').update(o).eq('id',edit);
   else for(let i=0;i<3;i++){await loadOrders();o.id=nextId();r=await sb.from('orders').insert(o);if(!r.error||r.error.code!=='23505')break}
   if(r.error)throw r.error;
-  if(!edit&&o.dp>0){const pr=await sb.from('payments').insert({order_id:o.id,tanggal:o.masuk||day(0),jumlah:o.dp,catatan:'DP awal'});if(pr.error)throw new Error('Pesanan tersimpan, tetapi pembayaran gagal dicatat: '+pr.error.message)}
+  if(!edit&&o.dp>0){const pr=await sb.from('payments').insert({order_id:o.id,tanggal:o.masuk||day(0),jumlah:o.dp,catatan:o.bayar==='Lunas'?'Pelunasan':'DP awal'});if(pr.error)throw new Error('Pesanan tersimpan, tetapi pembayaran gagal dicatat: '+pr.error.message)}
   await loadOrders();toast('Pesanan disimpan');q='';flt='Semua';go('list');
   calSync(o.id,true).then(async ok=>{if(calUrl){await loadOrders();toast(ok?'Tersinkron ke Google Calendar':'Sinkron kalender gagal, coba dari detail pesanan');if(view==='list')renderList()}});
  }catch(x){$('#err').textContent='Gagal menyimpan: '+((x&&x.message)||'coba lagi')}
@@ -533,7 +561,7 @@ let per='Bulanan',inv=null;
 const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const fd=s=>s?new Date(s+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'-';
 const invNo=o=>'INV-'+String(o.id).replace('FAR-','');
-const invLines=o=>[['Tanggal masuk',fd(o.masuk)],['Nama pemesan',o.nama],...(o.logo?[['Nama logo',o.logo]]:[]),['WhatsApp',o.wa||'-'],['Jenis pesanan',o.jenis],['Paket',o.paket],['Deadline',fd(o.deadline)],['Admin',o.admin||'-'],['Status pengerjaan',o.status],['Harga',rp(o.harga)],['DP dibayar',rp(o.dp)],['Sisa pembayaran',rp(sisa(o))],['Status pembayaran',o.bayar]];
+const invLines=o=>[['Tanggal masuk',fd(o.masuk)],['Nama pemesan',o.nama],...(o.logo?[['Nama logo',o.logo]]:[]),['WhatsApp',o.wa||'-'],['Jenis pesanan',o.jenis],['Paket',o.paket],['Deadline',fd(o.deadline)],['Admin',o.admin||'-'],['Status pengerjaan',o.status],['Harga',rp(o.harga)],['DP dibayar',rp(o.dp)],...(sisa(o)>0?[['Sisa pembayaran',rp(sisa(o))]]:[]),['Status pembayaran',o.bayar]];
 function pkey(s){
  const d=new Date(s+'T00:00:00'),y=d.getFullYear();
  if(per==='Tahunan')return[String(y),String(y)];
@@ -604,7 +632,7 @@ function kilatTog(){$('#kilatBox').hidden=$('#f_tipe').value!=='Kilat'}
 function kilatCalc(){if($('#f_tipe').value!=='Kilat')return;if(!$('#f_mulai').value){$('#f_mulai').value=day(0);if(!$('#f_mulai_jam').value)$('#f_mulai_jam').value=NOW_J().slice(11)}
  const ms=Date.parse($('#f_mulai').value+'T'+($('#f_mulai_jam').value||'00:00')+':00+07:00')+864e5;if(!isNaN(ms)){const t=new Date(ms).toLocaleString('sv-SE',{timeZone:'Asia/Jakarta'});$('#f_deadline').value=t.slice(0,10);$('#f_jam').value=t.slice(11,16)}}
 $('#f_tipe').addEventListener('change',()=>{kilatTog();kilatCalc()});$('#f_mulai').addEventListener('change',kilatCalc);$('#f_mulai_jam').addEventListener('change',kilatCalc);$('#f_wa').addEventListener('input',waHint);
-$('#f_harga').addEventListener('input',()=>calc(true));
+$('#f_harga').addEventListener('input',()=>{calc(true);payRefresh()});$('#f_bayar').addEventListener('change',bayarTog);$('#p_jenis').addEventListener('change',payJenis);
 $('#f_dp').addEventListener('input',()=>calc(true));
 function fillPaket(){opt('#f_paket',(KATALOG[$('#f_jenis').value]||[]).map(p=>p[0]))}
 function pickPaket(){const p=(KATALOG[$('#f_jenis').value]||[]).find(x=>x[0]===$('#f_paket').value);if(p){$('#f_harga').value=p[1];calc(true)}}
@@ -617,7 +645,7 @@ function setPal(n,keep){n=['1','2','3','4'].includes(n)?n:'1';document.documentE
 let pal0='1';try{pal0=localStorage.getItem(PK)||'1'}catch(e){}
 setPal(pal0);
 let rkKey='',pays=[],allPays=[],cat=[],lastRekap=[];
-async function loadPays(id){const{data,error}=await sb.from('payments').select('*').eq('order_id',id).order('tanggal');pays=error?[]:(data||[]);renderPays(error?'Tabel pembayaran belum dibuat. Jalankan SQL di Supabase.':'')}
+async function loadPays(id){const{data,error}=await sb.from('payments').select('*').eq('order_id',id).order('tanggal');pays=error?[]:(data||[]);renderPays(error?'Tabel pembayaran belum dibuat. Jalankan SQL di Supabase.':'');payRefresh()}
 function renderPays(msg){$('#payList').innerHTML=msg?`<p class="err">${msg}</p>`:pays.length?pays.map(p=>`<div class="r" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${fd(p.tanggal)}<br><span class="mute">${esc(p.catatan||'')}</span></span><span style="text-align:right"><b>${rp(p.jumlah)}</b><br><button class="link" style="padding:4px 0" data-delpay="${p.id}">Hapus</button></span></div>`).join(''):'<p class="mute">Belum ada pembayaran tercatat.</p>'}
 async function syncPaid(id){
  const{data,error}=await sb.from('payments').select('jumlah').eq('order_id',id);if(error)throw error;
@@ -626,10 +654,12 @@ async function syncPaid(id){
  $('#f_dp').value=tot;$('#f_bayar').value=by;calc(false);await loadOrders();
 }
 async function addPay(){
- const j=+$('#p_jumlah').value||0,t=$('#p_tgl').value||day(0),h=+$('#f_harga').value||0,d=+$('#f_dp').value||0,e=$('#pErr');e.textContent='';
- if(j<=0){e.textContent='Isi jumlah pembayaran.';return}
+ const jn=$('#p_jenis').value,t=$('#p_tgl').value||day(0),h=+$('#f_harga').value||0,d=+$('#f_dp').value||0,e=$('#pErr');e.textContent='';
+ const j=jn==='Lunas'?Math.max(0,h-d):(+$('#p_jumlah').value||0);
+ if(j<=0){e.textContent=jn==='Lunas'?'Tidak ada sisa untuk dilunasi.':'Isi jumlah pembayaran.';return}
  if(d+j>h){e.textContent='Total pembayaran melebihi harga pesanan.';return}
- try{const r=await sb.from('payments').insert({order_id:edit,tanggal:t,jumlah:j,catatan:$('#p_cat').value.trim()});if(r.error)throw r.error;await syncPaid(edit);await loadPays(edit);$('#p_jumlah').value='';$('#p_cat').value='';toast('Pembayaran dicatat')}catch(x){e.textContent='Gagal mencatat pembayaran: '+((x&&x.message)||'coba lagi')}
+ const lab={DP:'DP',Cicilan:'Cicilan',Lunas:'Pelunasan'}[jn],note=$('#p_cat').value.trim();
+ try{const r=await sb.from('payments').insert({order_id:edit,tanggal:t,jumlah:j,catatan:lab+(note?' - '+note:'')});if(r.error)throw r.error;await syncPaid(edit);await loadPays(edit);$('#p_jumlah').value='';$('#p_cat').value='';toast('Pembayaran dicatat')}catch(x){e.textContent='Gagal mencatat pembayaran: '+((x&&x.message)||'coba lagi')}
 }
 async function delPay(id){try{const r=await sb.from('payments').delete().eq('id',id);if(r.error)throw r.error;await syncPaid(edit);await loadPays(edit);toast('Pembayaran dihapus')}catch(x){$('#pErr').textContent='Gagal menghapus: '+((x&&x.message)||'coba lagi')}}
 async function loadCatalog(){const{data,error}=await sb.from('catalog').select('*').order('urut').order('id');cat=(!error&&data)?data:[];applyCat()}
