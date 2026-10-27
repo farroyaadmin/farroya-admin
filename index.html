@@ -261,6 +261,10 @@ nav button{color:var(--gt2);font-size:11px;min-height:52px;padding:6px 0}
 nav button.on{background:transparent;color:var(--gacc);box-shadow:none}
 nav button.on::before{content:"";position:absolute;left:28%;right:28%;bottom:1px;height:3px;border-radius:2px;background:var(--gacc)}
 .fab{bottom:calc(86px + env(safe-area-inset-bottom,0px));background-color:#D9AD59;color:#101D35}
+.rc{cursor:pointer;text-align:left}
+.rkb{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;margin-bottom:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh)}
+.kd{display:inline-block;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;color:#fff}
+.k-DP{background:#B8862B}.k-Cicilan{background:#2A63BF}.k-Pelunasan{background:#1F7A5A}.k-Pengembalian{background:#B3261E}
 </style>
 </head>
 <body>
@@ -281,6 +285,7 @@ nav button.on::before{content:"";position:absolute;left:28%;right:28%;bottom:1px
   <section id="v-set" hidden></section>
   <section id="v-cat" hidden></section>
   <section id="v-gcal" hidden></section>
+  <section id="v-rkd" hidden></section>
   <section id="v-inv" hidden></section>
 
   <section id="v-list" hidden>
@@ -441,14 +446,14 @@ function renderList(){
  $('#res').innerHTML=r.length?r.map(card).join(''):'<p class="mute empty">Tidak ada pesanan yang cocok. Ubah kata kunci atau pilih filter lain.</p>';
  $('#count').textContent=invMode?'Pilih pesanan untuk dibuatkan invoice':r.length+' pesanan';
 }
-const VIEWS=['home','deadline','list','recap','more','cust','set','cat','gcal','form','inv','login'];
+const VIEWS=['home','deadline','list','recap','more','cust','set','cat','gcal','rkd','form','inv','login'];
 function go(v){
  view=v;if(v!=='list')invMode=false;
  document.body.classList.toggle('out',v==='login');document.body.dataset.v=v;
  VIEWS.forEach(k=>$('#v-'+k).hidden=k!==v);
- const nk={cust:'cust',set:'more',cat:'more',gcal:'more',inv:'more',form:'list'}[v]||v;
+ const nk={cust:'cust',rkd:'recap',set:'more',cat:'more',gcal:'more',inv:'more',form:'list'}[v]||v;
  document.querySelectorAll('nav button[id]').forEach(b=>b.classList.toggle('on',b.id==='n-'+nk));
- const R={home:renderHome,deadline:renderDeadline,recap:renderRecap,more:renderMore,cust:renderCust,set:renderSet,cat:renderCat,gcal:renderGcal,list:()=>{$('#q').value=q;renderList()}};
+ const R={home:renderHome,deadline:renderDeadline,recap:renderRecap,rkd:renderRkd,more:renderMore,cust:renderCust,set:renderSet,cat:renderCat,gcal:renderGcal,list:()=>{$('#q').value=q;renderList()}};
  if(R[v])R[v]();navBadge();
  window.scrollTo(0,0);
 }
@@ -494,7 +499,7 @@ async function saveForm(){
  b.disabled=false;
 }
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-go],[data-f],[data-chip],[data-edit],[data-new],[data-per],#bReset,#bSave,#bDel,#bInv,#bPdf,#bLogin,#bOut,[data-pal],[data-inv],#bPay,#bCal,[data-cal],[data-delpay],[data-csave],[data-cdel],#bCatAdd,#bExpRekap,[data-exp],[data-st],[data-dt],[data-nt],[data-rk]');if(!t)return;
+ const t=e.target.closest('[data-go],[data-f],[data-chip],[data-edit],[data-new],[data-per],#bReset,#bSave,#bDel,#bInv,#bPdf,#bLogin,#bOut,[data-pal],[data-inv],#bPay,#bCal,[data-cal],[data-delpay],[data-csave],[data-cdel],#bCatAdd,#bExpRekap,[data-exp],[data-st],[data-dt],[data-nt],[data-rk],[data-rkd]');if(!t)return;
  if(t.id==='bSave')return saveForm();
  if(t.id==='bPay')return addPay();
  if(t.id==='bCal')return calBtn();
@@ -516,7 +521,8 @@ document.addEventListener('click',e=>{
  if(t.dataset.st)return quickSt(t.dataset.id,t.dataset.st);
  if(t.dataset.dt){dtab=t.dataset.dt;return view==='deadline'?renderDeadline():go('deadline')}
  if(t.dataset.nt)return ntAsk();
- if(t.dataset.rk){per='Harian';return go('recap')}
+ if(t.dataset.rk){per='Harian';rkKey=day(0);return go('rkd')}
+ if(t.dataset.rkd){rkKey=t.dataset.rkd;return go('rkd')}
  if(t.dataset.inv){invMode=true;q='';flt='Semua';return go('list')}
  if(t.dataset.edit)return invMode?showInv(t.dataset.edit):openForm(t.dataset.edit);
  if(t.dataset.f){flt=t.dataset.f;q='';return go('list')}
@@ -537,8 +543,27 @@ function pkey(s){
  const f=x=>x.toLocaleDateString('id-ID',{day:'numeric',month:'short'});
  return[ymd(m),f(m)+' - '+f(e)+' '+e.getFullYear()];
 }
+const keyLbl=k=>pkey(per==='Bulanan'?k+'-01':per==='Tahunan'?k+'-01-01':k)[1];
+function payKinds(){
+ const by={},K={};allPays.forEach(p=>(by[p.order_id]=by[p.order_id]||[]).push(p));
+ Object.keys(by).forEach(oid=>{const o=orders.find(x=>x.id===oid),h=o?+o.harga||0:0;let cum=0,first=true;
+  by[oid].sort((a,b)=>String(a.tanggal).localeCompare(String(b.tanggal))||(+a.id||0)-(+b.id||0)).forEach(p=>{const j=+p.jumlah||0;cum+=j;K[p.id]=j<0?'Pengembalian':(h>0&&cum>=h)?'Pelunasan':first?'DP':'Cicilan';if(j>0)first=false})});
+ return K}
+function renderRkd(){
+ const K=payKinds(),om=new Map(orders.map(o=>[o.id,o]));
+ const pp=allPays.filter(p=>om.has(p.order_id)&&pkey(p.tanggal||day(0))[0]===rkKey).sort((a,b)=>String(a.tanggal).localeCompare(String(b.tanggal))||(+a.id||0)-(+b.id||0));
+ const po=orders.filter(o=>o.status!=='Batal'&&pkey(o.masuk||day(0))[0]===rkKey);
+ const tot=pp.reduce((a,p)=>a+(+p.jumlah||0),0),by={};pp.forEach(p=>{const k=K[p.id]||'Cicilan';(by[k]=by[k]||{n:0,v:0});by[k].n++;by[k].v+=+p.jumlah||0});
+ const omz=po.reduce((a,o)=>a+(+o.harga||0),0),sis=po.reduce((a,o)=>a+sisa(o),0);
+ $('#v-rkd').innerHTML=`<button class="btn ghost" data-go="recap" style="margin-top:0">‹ Kembali ke rekap</button><h1 style="margin-top:14px">${keyLbl(rkKey)}</h1>
+ <div class="tile wide" style="cursor:default"><b>${pp.length}</b><div><span>Pembayaran diterima</span><em>Uang masuk ${rp(tot)}</em><span>${po.length} pesanan masuk, nilai ${rp(omz)}, belum lunas ${rp(sis)}</span></div></div>
+ <h2>Uang masuk berasal dari</h2>${['DP','Cicilan','Pelunasan','Pengembalian'].filter(k=>by[k]).map(k=>`<div class="rkb"><span><span class="kd k-${k}">${k}</span> ${by[k].n} pembayaran</span><b>${rp(by[k].v)}</b></div>`).join('')||'<p class="mute">Belum ada pembayaran pada periode ini.</p>'}
+ <h2>Rincian pembayaran</h2>${pp.map(p=>{const o=om.get(p.order_id),k=K[p.id]||'Cicilan';return `<button class="card" data-edit="${esc(o.id)}"><div class="r"><b>${esc(o.logo||o.nama)}</b><span class="kd k-${k}">${k}</span></div><div class="mute">${o.logo?'Pemesan: '+esc(o.nama)+', ':''}${esc(o.paket)}, ${esc(o.id)}</div><div class="r"><span class="mute">${fd(p.tanggal)}${p.catatan?', '+esc(p.catatan):''}${o.status==='Batal'?', pesanan batal':''}</span><b>${rp(p.jumlah)}</b></div></button>`}).join('')||'<p class="mute">Tidak ada.</p>'}
+ <h2>Pesanan masuk (nilai pesanan)</h2>${po.map(o=>`<button class="card" data-edit="${esc(o.id)}"><div class="r"><b>${esc(o.logo||o.nama)}</b><b>${rp(o.harga)}</b></div><div class="mute">${o.logo?'Pemesan: '+esc(o.nama)+', ':''}${esc(o.paket)}, ${esc(o.id)}</div><div class="r"><span class="mute">${esc(o.status)}</span><span class="mute">${sisa(o)>0?'Sisa '+rp(sisa(o)):'Lunas'}</span></div></button>`).join('')||'<p class="mute">Tidak ada pesanan masuk pada periode ini.</p>'}
+ <p class="mute" style="margin-top:12px">Jenis pembayaran ditentukan otomatis: pembayaran pertama dihitung DP, pembayaran yang membuat pesanan lunas dihitung Pelunasan, dan yang di antaranya Cicilan.</p>`;
+}
 function renderRecap(){
- const g={},get=s=>{const[k,l]=pkey(s);return g[k]||(g[k]={l,n:0,v:0,p:0,u:0})};
+ const g={},get=s=>{const[k,l]=pkey(s);return g[k]||(g[k]={k,l,n:0,v:0,p:0,u:0})};
  orders.filter(o=>o.status!=='Batal').forEach(o=>{const x=get(o.masuk||day(0));x.n++;x.v+=+o.harga||0;x.u+=sisa(o)});
  const ids=new Set(orders.map(o=>o.id));allPays.filter(p=>ids.has(p.order_id)).forEach(p=>{get(p.tanggal||day(0)).p+=+p.jumlah||0});
  const rows=Object.keys(g).sort().reverse().map(k=>g[k]);lastRekap=rows;
@@ -547,7 +572,7 @@ function renderRecap(){
  <div class="chips" style="margin-top:14px">${['Harian','Mingguan','Bulanan','Tahunan'].map(p=>`<button class="chip${per===p?' on':''}" data-per="${p}">${p}</button>`).join('')}</div>
  <div class="tile wide" style="cursor:default"><b>${T.n}</b><div><span>Total pesanan (tanpa batal)</span><em>Uang masuk ${rp(T.p)}</em><span>Nilai ${rp(T.v)}, belum lunas ${rp(T.u)}</span></div></div>
  <h2>Per ${per==='Harian'?'hari':per==='Mingguan'?'minggu':per==='Bulanan'?'bulan':'tahun'}</h2>
- ${rows.map(x=>`<div class="card rc"><div class="r"><b>${x.l}</b><span class="mute">${x.n} pesanan masuk</span></div><div class="g"><div><span>Nilai pesanan</span><b>${rp(x.v)}</b></div><div><span>Uang masuk</span><b>${rp(x.p)}</b></div><div><span>Belum lunas</span><b>${rp(x.u)}</b></div></div></div>`).join('')||'<p class="mute empty">Belum ada data untuk direkap.</p>'}
+ ${rows.map(x=>`<button class="card rc" data-rkd="${esc(x.k)}"><div class="r"><b>${x.l}</b><span class="mute">${x.n} pesanan masuk ›</span></div><div class="g"><div><span>Nilai pesanan</span><b>${rp(x.v)}</b></div><div><span>Uang masuk</span><b>${rp(x.p)}</b></div><div><span>Belum lunas</span><b>${rp(x.u)}</b></div></div></button>`).join('')||'<p class="mute empty">Belum ada data untuk direkap.</p>'}
  <button class="btn ghost" id="bExpRekap">Ekspor rekap (CSV)</button>`;
 }
 function showInv(id){
@@ -591,7 +616,7 @@ const PK='farroya_tema_v2';
 function setPal(n,keep){n=['1','2','3','4'].includes(n)?n:'1';document.documentElement.dataset.pal=n;if(keep)try{localStorage.setItem(PK,n)}catch(e){}}
 let pal0='1';try{pal0=localStorage.getItem(PK)||'1'}catch(e){}
 setPal(pal0);
-let pays=[],allPays=[],cat=[],lastRekap=[];
+let rkKey='',pays=[],allPays=[],cat=[],lastRekap=[];
 async function loadPays(id){const{data,error}=await sb.from('payments').select('*').eq('order_id',id).order('tanggal');pays=error?[]:(data||[]);renderPays(error?'Tabel pembayaran belum dibuat. Jalankan SQL di Supabase.':'')}
 function renderPays(msg){$('#payList').innerHTML=msg?`<p class="err">${msg}</p>`:pays.length?pays.map(p=>`<div class="r" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${fd(p.tanggal)}<br><span class="mute">${esc(p.catatan||'')}</span></span><span style="text-align:right"><b>${rp(p.jumlah)}</b><br><button class="link" style="padding:4px 0" data-delpay="${p.id}">Hapus</button></span></div>`).join(''):'<p class="mute">Belum ada pembayaran tercatat.</p>'}
 async function syncPaid(id){
@@ -635,7 +660,7 @@ function expRekap(){saveFile('farroya-rekap-'+per.toLowerCase()+'-'+day(0)+'.csv
 const SB_URL='https://xbnpvtwvmnkhiymolorv.supabase.co',SB_KEY='sb_publishable_Ben-KEjcyCQJYT2Jmi4ngg_Ne6mwMIA';
 const sb=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
 async function loadOrders(){const[a,b]=await Promise.all([sb.from('orders').select('*'),sb.from('payments').select('*')]);if(a.error){toast('Gagal memuat data');return false}orders=(a.data||[]).map(o=>({...o,status:normSt(o.status),tipe:o.tipe||'Reguler'}));allPays=b.error?[]:(b.data||[]);return true}
-async function refresh(){if(!authed)return;await loadOrders();if(view==='home')renderHome();else if(view==='list')renderList();else if(view==='recap')renderRecap();else if(view==='deadline')renderDeadline();else if(view==='cust')renderCust();navBadge()}
+async function refresh(){if(!authed)return;await loadOrders();if(view==='home')renderHome();else if(view==='list')renderList();else if(view==='recap')renderRecap();else if(view==='deadline')renderDeadline();else if(view==='cust')renderCust();else if(view==='rkd')renderRkd();navBadge()}
 async function enter(s){userEmail=s.user.email||'';authed=true;await Promise.all([loadOrders(),loadCatalog(),loadCfg()]);go('home');{const h=decodeURIComponent(location.hash.slice(1));if(h&&orders.some(o=>o.id===h))openForm(h)}}
 async function doLogin(){
  if(!sb)return;
