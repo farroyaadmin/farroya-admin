@@ -265,6 +265,8 @@ nav button.on::before{content:"";position:absolute;left:28%;right:28%;bottom:1px
 .rkb{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;margin-bottom:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh)}
 .kd{display:inline-block;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;color:#fff}
 .k-DP{background:#B8862B}.k-Cicilan{background:#2A63BF}.k-Pelunasan{background:#1F7A5A}.k-Pengembalian{background:#B3261E}
+.paper .ar{font-size:18px;text-align:right;font-family:"Noto Naskh Arabic","Geeza Pro","Traditional Arabic",serif}
+input[dir=rtl]{text-align:right;font-size:18px}
 </style>
 </head>
 <body>
@@ -304,6 +306,8 @@ nav button.on::before{content:"";position:absolute;left:28%;right:28%;bottom:1px
     <h3 class="sec">Pelanggan</h3>
     <div class="fld"><label for="f_nama">Nama pemesan</label><input id="f_nama" autocomplete="off"></div>
     <div class="fld"><label for="f_logo">Nama logo atau proyek</label><input id="f_logo" autocomplete="off" placeholder="Nama yang akan dibuatkan logonya"></div>
+    <div class="fld"><label for="f_tulisan_arab">Tulisan Arab</label><input id="f_tulisan_arab" dir="rtl" lang="ar" autocomplete="off"></div>
+    <div class="fld"><label for="f_tulisan_latin">Tulisan Latin</label><input id="f_tulisan_latin" autocomplete="off"></div>
     <div class="fld"><label for="f_wa">Nomor WhatsApp</label><input id="f_wa" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx"><div class="mute" id="waHint" hidden style="margin-top:4px"></div></div>
     <h3 class="sec">Pesanan dan harga</h3>
     <div class="row2"><div class="fld"><label for="f_jenis">Jenis pesanan</label><select id="f_jenis"></select></div>
@@ -340,7 +344,7 @@ nav button.on::before{content:"";position:absolute;left:28%;right:28%;bottom:1px
     <button class="btn ghost" id="bInv">Buat invoice (PDF)</button>
     <a class="btn ghost" id="bWa" target="_blank" rel="noopener">Chat pelanggan di WhatsApp</a>
     <button class="btn ghost" id="bDel">Hapus pesanan</button>
-    <button class="btn ghost" data-go="list">Batal</button>
+    <button class="btn ghost" data-cancel="1">Batal</button>
   </section>
 </main>
 <nav>
@@ -363,7 +367,7 @@ const BAYAR=['Belum Bayar','DP','Lunas'];
 const KATALOG0={'Logo Arab':[['Paket Simple',25000],['Paket Spesial',75000],['Paket Istimewa',100000],['Paket Sempurna',150000],['Paket Kilat',200000],['Paket Filosofi',350000],['Paket Branding Kit',500000]],'Logo Wedding':[['Paket 50k',50000],['Paket 100k',100000],['Paket 150k',150000],['Paket 200k',200000],['Undangan Digital',350000]],'Kaligrafi':[['Paket 50k',50000],['Paket 100k',100000],['Paket 150k',150000],['Paket 200k',200000]]};
 let KATALOG=KATALOG0,JENIS=Object.keys(KATALOG);
 
-const F=['id','nama','wa','jenis','paket','harga','dp','masuk','deadline','jam','admin','status','bayar','catatan','link','logo','tipe','jam_masuk','mulai','mulai_jam'];
+const F=['id','nama','wa','jenis','paket','harga','dp','masuk','deadline','jam','admin','status','bayar','catatan','link','logo','tipe','jam_masuk','mulai','mulai_jam','tulisan_arab','tulisan_latin'];
 const $=s=>document.querySelector(s);
 const rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -455,7 +459,7 @@ function go(v){
  view=v;if(v!=='list')invMode=false;
  document.body.classList.toggle('out',v==='login');document.body.dataset.v=v;
  VIEWS.forEach(k=>$('#v-'+k).hidden=k!==v);
- const nk={cust:'cust',rkd:'recap',set:'more',cat:'more',gcal:'more',inv:'more',form:'list'}[v]||v;
+ const nk={cust:'cust',rkd:'recap',set:'more',cat:'more',gcal:'more',inv:'list',form:'list'}[v]||v;
  document.querySelectorAll('nav button[id]').forEach(b=>b.classList.toggle('on',b.id==='n-'+nk));
  const R={home:renderHome,deadline:renderDeadline,recap:renderRecap,rkd:renderRkd,more:renderMore,cust:renderCust,set:renderSet,cat:renderCat,gcal:renderGcal,list:()=>{$('#q').value=q;renderList()}};
  if(R[v])R[v]();navBadge();
@@ -497,7 +501,7 @@ function openForm(id){
  const sel=(i,v)=>{const e=$(i);if(v&&![...e.options].some(x=>x.value===v))e.add(new Option(v,v))};
  sel('#f_jenis',o.jenis);$('#f_jenis').value=o.jenis;fillPaket();sel('#f_paket',o.paket);F.forEach(k=>$('#f_'+k).value=o[k]??'');
  $('#f_dp').readOnly=!!id;$('label[for=f_dp]').textContent=id?'Sudah dibayar (Rp)':'Jumlah DP (Rp)';$('#f_bayar').disabled=!!id;$('#payBox').hidden=!id;$('#p_tgl').value=day(0);$('#pErr').textContent='';pays=[];if(id)loadPays(id);
- $('#fTitle').textContent=id?'Edit pesanan':'Tambah pesanan';
+ $('#fTitle').textContent=id?'Edit pesanan':'Tambah pesanan';$('#bSave').textContent=id?'Simpan perubahan':'Simpan pesanan';
  $('#err').textContent='';bayarTog();kilatTog();waHint();$('#calBox').hidden=!id;if(id)calBox(o);
  const w=String(o.wa||'').replace(/\D/g,'').replace(/^0/,'62');
  $('#bWa').hidden=!id||!w;$('#bWa').href='https://wa.me/'+w;$('#bDel').hidden=!id;$('#bInv').hidden=!id;
@@ -511,7 +515,10 @@ function twoTap(b,armed,fn){
 async function saveForm(){
  const o={};F.forEach(k=>o[k]=$('#f_'+k).value.trim());
  o.harga=+o.harga||0;o.dp=+o.dp||0;
- if(!o.nama){$('#err').textContent='Nama pelanggan wajib diisi.';$('#f_nama').focus();return}
+ if(!o.nama){$('#err').textContent='Nama pemesan wajib diisi.';$('#f_nama').focus();return}
+ if(o.wa&&waN(o.wa).length<10){$('#err').textContent='Nomor WhatsApp tidak valid. Contoh: 081234567890.';$('#f_wa').focus();return}
+ if(o.deadline&&o.masuk&&o.deadline<o.masuk){$('#err').textContent='Deadline tidak boleh sebelum tanggal masuk.';$('#f_deadline').focus();return}
+ if(o.harga<=0){$('#err').textContent='Total harga harus lebih dari 0.';$('#f_harga').focus();return}
  if(o.dp>o.harga){$('#err').textContent='Jumlah pembayaran tidak boleh lebih besar dari harga.';$('#f_dp').focus();return}
  if(!edit&&o.bayar==='DP'&&o.dp<=0){$('#err').textContent='Isi jumlah DP, atau pilih Belum Bayar.';$('#f_dp').focus();return}
  const b=$('#bSave');b.disabled=true;
@@ -521,13 +528,13 @@ async function saveForm(){
   else for(let i=0;i<3;i++){await loadOrders();o.id=nextId();r=await sb.from('orders').insert(o);if(!r.error||r.error.code!=='23505')break}
   if(r.error)throw r.error;
   if(!edit&&o.dp>0){const pr=await sb.from('payments').insert({order_id:o.id,tanggal:o.masuk||day(0),jumlah:o.dp,catatan:o.bayar==='Lunas'?'Pelunasan':'DP awal'});if(pr.error)throw new Error('Pesanan tersimpan, tetapi pembayaran gagal dicatat: '+pr.error.message)}
-  await loadOrders();toast('Pesanan disimpan');q='';flt='Semua';go('list');
+  await loadOrders();const was=edit;toast(was?'Perubahan disimpan':'Pesanan disimpan');q='';flt='Semua';if(was)showInv(was);else go('list');
   calSync(o.id,true).then(async ok=>{if(calUrl){await loadOrders();toast(ok?'Tersinkron ke Google Calendar':'Sinkron kalender gagal, coba dari detail pesanan');if(view==='list')renderList()}});
  }catch(x){$('#err').textContent='Gagal menyimpan: '+((x&&x.message)||'coba lagi')}
  b.disabled=false;
 }
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-go],[data-f],[data-chip],[data-edit],[data-new],[data-per],#bReset,#bSave,#bDel,#bInv,#bPdf,#bLogin,#bOut,[data-pal],[data-inv],#bPay,#bCal,[data-cal],[data-delpay],[data-csave],[data-cdel],#bCatAdd,#bExpRekap,[data-exp],[data-st],[data-dt],[data-nt],[data-rk],[data-rkd]');if(!t)return;
+ const t=e.target.closest('[data-go],[data-f],[data-chip],[data-edit],[data-new],[data-per],#bReset,#bSave,#bDel,#bInv,#bPdf,#bLogin,#bOut,[data-pal],[data-inv],#bPay,#bCal,[data-cal],[data-delpay],[data-csave],[data-cdel],#bCatAdd,#bExpRekap,[data-exp],[data-st],[data-dt],[data-nt],[data-rk],[data-rkd],[data-editform],[data-cancel]');if(!t)return;
  if(t.id==='bSave')return saveForm();
  if(t.id==='bPay')return addPay();
  if(t.id==='bCal')return calBtn();
@@ -552,7 +559,9 @@ document.addEventListener('click',e=>{
  if(t.dataset.rk){per='Harian';rkKey=day(0);return go('rkd')}
  if(t.dataset.rkd){rkKey=t.dataset.rkd;return go('rkd')}
  if(t.dataset.inv){invMode=true;q='';flt='Semua';return go('list')}
- if(t.dataset.edit)return invMode?showInv(t.dataset.edit):openForm(t.dataset.edit);
+ if(t.dataset.editform)return openForm(t.dataset.editform);
+ if(t.dataset.cancel)return edit?showInv(edit):go('list');
+ if(t.dataset.edit)return showInv(t.dataset.edit);
  if(t.dataset.f){flt=t.dataset.f;q='';return go('list')}
  if(t.dataset.chip){flt=t.dataset.chip;return renderList()}
  go(t.dataset.go);refresh();
@@ -561,7 +570,7 @@ let per='Bulanan',inv=null;
 const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const fd=s=>s?new Date(s+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'-';
 const invNo=o=>'INV-'+String(o.id).replace('FAR-','');
-const invLines=o=>[['Tanggal masuk',fd(o.masuk)],['Nama pemesan',o.nama],...(o.logo?[['Nama logo',o.logo]]:[]),['WhatsApp',o.wa||'-'],['Jenis pesanan',o.jenis],['Paket',o.paket],['Deadline',fd(o.deadline)],['Admin',o.admin||'-'],['Status pengerjaan',o.status],['Harga',rp(o.harga)],['DP dibayar',rp(o.dp)],...(sisa(o)>0?[['Sisa pembayaran',rp(sisa(o))]]:[]),['Status pembayaran',o.bayar]];
+const invLines=(o,pdf)=>[['Nomor pesanan',o.id],['Tanggal pemesanan',fd(o.masuk)],['Nama pemesan',o.nama],...(o.logo?[['Nama logo',o.logo]]:[]),...(o.tulisan_arab&&!pdf?[['Tulisan Arab',o.tulisan_arab]]:[]),...(o.tulisan_latin?[['Tulisan Latin',o.tulisan_latin]]:[]),['WhatsApp',o.wa||'-'],['Jenis layanan',o.jenis],['Paket',o.paket],['Deadline',fd(o.deadline)+(o.jam?', '+String(o.jam).replace(':','.'):'')],['Admin',o.admin||'-'],['Status pengerjaan',o.status],['Total harga',rp(o.harga)],['Sudah dibayar',rp(o.dp)],...(sisa(o)>0?[['Sisa pembayaran',rp(sisa(o))]]:[]),['Status pembayaran',o.bayar]];
 function pkey(s){
  const d=new Date(s+'T00:00:00'),y=d.getFullYear();
  if(per==='Tahunan')return[String(y),String(y)];
@@ -605,10 +614,11 @@ function renderRecap(){
 }
 function showInv(id){
  const o=orders.find(x=>x.id===id);if(!o)return;inv=id;
- $('#v-inv').innerHTML=`<h1>Invoice</h1><p class="mute">Bukti pesanan untuk pelanggan. Cek dulu, lalu unduh.</p>
- <div class="paper"><div class="ph">FARROYA ARABIC DESIGN</div><div class="pn">${invNo(o)}</div>${invLines(o).map(([a,b])=>`<div class="r"><span class="mute">${a}</span><b>${esc(b)}</b></div>`).join('')}<p class="mute">Pesanan Anda sudah tercatat di sistem kami. Simpan invoice ini sebagai bukti.</p><p class="mute" style="margin-top:0"><i>Setiap logo adalah doa. Terima kasih telah mempercayakan karya Anda kepada Farroya.</i></p></div>
- <button class="btn" id="bPdf">Unduh invoice (PDF)</button><p class="err" id="iErr" role="alert"></p>
- <button class="btn ghost" data-edit="${esc(id)}">Kembali ke pesanan</button>`;
+ $('#v-inv').innerHTML=`<h1>Invoice ${esc(id)}</h1><div class="mute">Detail dan bukti pesanan. Ketuk Edit untuk mengubah data.</div>
+ <div class="paper"><div class="ph">FARROYA ARABIC DESIGN</div><div class="pn">${invNo(o)}</div>${invLines(o).map(([a,b])=>`<div class="r"><span class="mute">${a}</span><b${a==='Tulisan Arab'?' dir="rtl" lang="ar" class="ar"':''}>${esc(b)}</b></div>`).join('')}<p class="mute">Pesanan Anda sudah tercatat di sistem kami. Simpan invoice ini sebagai bukti.</p><p class="mute" style="margin-top:0"><i>Setiap logo adalah doa. Terima kasih telah mempercayakan karya Anda kepada Farroya.</i></p></div>
+ <button class="btn" data-editform="${esc(id)}">Edit pesanan</button>
+ <button class="btn ghost" id="bPdf">Unduh invoice (PDF)</button><p class="err" id="iErr" role="alert"></p>
+ <button class="btn ghost" data-go="list">‹ Kembali ke daftar Pesanan</button>`;
  go('inv');
 }
 async function pdf(){
@@ -620,7 +630,7 @@ async function pdf(){
   p.setTextColor(255,255,255);p.setFont('helvetica','bold');p.setFontSize(20);p.text('FARROYA ARABIC DESIGN',15,16);
   p.setFont('helvetica','normal');p.setFontSize(10);p.setTextColor(195,202,213);p.text('Invoice / Bukti Pesanan   '+invNo(o),15,26);
   let y=52;
-  invLines(o).forEach(([a,b])=>{p.setFont('helvetica','normal');p.setFontSize(10);p.setTextColor(91,103,125);p.text(a,15,y);p.setFont('helvetica','bold');p.setTextColor(14,27,51);p.text(String(b),80,y);p.setDrawColor(213,218,226);p.line(15,y+3,195,y+3);y+=10});
+  invLines(o,true).forEach(([a,b])=>{p.setFont('helvetica','normal');p.setFontSize(10);p.setTextColor(91,103,125);p.text(a,15,y);p.setFont('helvetica','bold');p.setTextColor(14,27,51);p.text(String(b),80,y);p.setDrawColor(213,218,226);p.line(15,y+3,195,y+3);y+=10});
   p.setFont('helvetica','normal');p.setTextColor(91,103,125);p.text('Pesanan Anda sudah tercatat di sistem Farroya Arabic Design. Terima kasih.',15,y+8);p.setFont('helvetica','italic');p.text('Setiap logo adalah doa. Terima kasih telah mempercayakan karya Anda kepada Farroya.',15,y+16);
   const fn='Invoice-'+invNo(o)+'.pdf';if(d)await d.save({filename:fn,data:p.output('arraybuffer')});else p.save(fn);
  }catch(x){if(!x||x.code!=='declined')e.textContent='Gagal membuat PDF. Coba lagi, atau gunakan screenshot invoice.'}
