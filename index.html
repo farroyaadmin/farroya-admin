@@ -267,6 +267,28 @@ nav button.on::before{content:"";position:absolute;left:28%;right:28%;bottom:1px
 .k-DP{background:#B8862B}.k-Cicilan{background:#2A63BF}.k-Pelunasan{background:#1F7A5A}.k-Pengembalian{background:#B3261E}
 .paper .ar{font-size:18px;text-align:right;font-family:"Noto Naskh Arabic","Geeza Pro","Traditional Arabic",serif}
 input[dir=rtl]{text-align:right;font-size:18px}
+input,select,textarea{min-width:0;max-width:100%}
+input:not([type=checkbox]):not([type=radio]),select{height:48px;padding-top:0;padding-bottom:0}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;text-align:left}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left;min-height:1.2em}
+textarea{min-height:72px}
+.row2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.row2>*,.fld{min-width:0}
+.fs{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 12px 2px;margin-bottom:12px;box-shadow:var(--sh)}
+.fs input,.fs select,.fs textarea{background:var(--bg)}
+.fs .sec{margin:0 0 10px;border:0;padding:0;font-size:13px;color:var(--ink)}
+.sisaRow{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px dashed var(--line);margin-bottom:12px}
+.sisaRow b{font-size:18px}
+details.fs summary{list-style:none;cursor:pointer;min-height:44px;display:flex;flex-direction:column;justify-content:center;font-weight:700;font-size:14px;padding-bottom:10px}
+details.fs summary::-webkit-details-marker{display:none}
+details.fs summary span{font-weight:400;font-size:12px;color:var(--mute)}
+details.fs[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+.fbar{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:6;margin:4px -14px 0;padding:14px 14px 10px;background:linear-gradient(180deg,rgba(0,0,0,0),var(--bg) 40%)}
+.fbar .row2{grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:10px}
+.fbar .btn{margin:0}.fbar .err{min-height:0;margin:0 0 6px}
+.fact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 14px}
+.fact .btn{margin:0;padding:11px 4px;font-size:12px}
+.fact [hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -300,51 +322,55 @@ input[dir=rtl]{text-align:right;font-size:18px}
 
   <section id="v-form" hidden>
     <h1 id="fTitle"></h1>
-    <p class="mute">Sisa pembayaran dihitung otomatis dari harga dikurangi DP.</p>
-    <div class="row2"><div class="fld"><label for="f_id">ID pesanan</label><input id="f_id" readonly></div>
-    <div class="fld"><label for="f_admin">Admin</label><input id="f_admin" list="admins" autocomplete="off"><datalist id="admins"><option value="Fauziah"></datalist></div></div>
-    <h3 class="sec">Pelanggan</h3>
-    <div class="fld"><label for="f_nama">Nama pemesan</label><input id="f_nama" autocomplete="off"></div>
-    <div class="fld"><label for="f_logo">Nama logo atau proyek</label><input id="f_logo" autocomplete="off" placeholder="Nama yang akan dibuatkan logonya"></div>
-    <div class="fld"><label for="f_tulisan_arab">Tulisan Arab</label><input id="f_tulisan_arab" dir="rtl" lang="ar" autocomplete="off"></div>
-    <div class="fld"><label for="f_tulisan_latin">Tulisan Latin</label><input id="f_tulisan_latin" autocomplete="off"></div>
-    <div class="fld"><label for="f_wa">Nomor WhatsApp</label><input id="f_wa" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx"><div class="mute" id="waHint" hidden style="margin-top:4px"></div></div>
-    <h3 class="sec">Pesanan dan harga</h3>
-    <div class="row2"><div class="fld"><label for="f_jenis">Jenis pesanan</label><select id="f_jenis"></select></div>
-    <div class="fld"><label for="f_paket">Paket</label><select id="f_paket"></select></div></div>
-    <div class="row2"><div class="fld"><label for="f_tipe">Tipe pesanan</label><select id="f_tipe"><option>Reguler</option><option>Kilat</option></select></div><div class="fld"><label for="f_jam_masuk">Jam order</label><input id="f_jam_masuk" type="time"></div></div>
-    <div id="kilatBox" hidden><div class="row2"><div class="fld"><label for="f_mulai">Mulai pengerjaan</label><input id="f_mulai" type="date"></div><div class="fld"><label for="f_mulai_jam">Jam mulai</label><input id="f_mulai_jam" type="time"></div></div><p class="mute">Paket kilat ditargetkan selesai 1 × 24 jam. Deadline yang Anda isi di bawah tetap menjadi acuan.</p></div>
-    <div class="row2"><div class="fld"><label for="f_harga">Harga (Rp)</label><input id="f_harga" type="number" inputmode="numeric" min="0"></div>
-    <div class="fld"><label for="f_bayar">Pembayaran</label><select id="f_bayar"></select></div></div>
-    <div class="fld" id="dpBox"><label for="f_dp">Jumlah DP (Rp)</label><input id="f_dp" type="number" inputmode="numeric" min="0"></div>
-    <div class="fld" id="sisaBox"><label>Sisa pembayaran</label><div class="calc" id="sisa">Rp0</div></div>
-    <div id="payBox" hidden>
-    <h3 class="sec">Riwayat pembayaran</h3>
-    <div id="payList"></div>
-    <div id="payDone" class="note" style="margin:0 0 8px" hidden>Pesanan ini sudah lunas.</div>
-    <div id="payNew">
-    <div class="fld"><label for="p_jenis">Jenis pembayaran</label><select id="p_jenis"></select></div>
-    <div class="row2"><div class="fld"><label for="p_jumlah">Jumlah (Rp)</label><input id="p_jumlah" type="number" inputmode="numeric" min="0"></div><div class="fld"><label for="p_tgl">Tanggal bayar</label><input id="p_tgl" type="date"></div></div>
-    <div class="fld"><label for="p_cat">Catatan pembayaran (opsional)</label><input id="p_cat" placeholder="Misal: transfer BCA" autocomplete="off"></div>
-    <p class="err" id="pErr" role="alert"></p>
-    <button class="btn ghost" id="bPay">Catat pembayaran</button>
+    <div class="fs">
+      <h3 class="sec">Pelanggan</h3>
+      <div class="fld"><label for="f_nama">Nama pemesan</label><input id="f_nama" autocomplete="off"></div>
+      <div class="fld"><label for="f_logo">Nama logo atau proyek</label><input id="f_logo" autocomplete="off" placeholder="Nama yang akan dibuatkan logonya"></div>
+      <div class="row2"><div class="fld"><label for="f_tulisan_arab">Tulisan Arab</label><input id="f_tulisan_arab" dir="rtl" lang="ar" autocomplete="off"></div>
+      <div class="fld"><label for="f_tulisan_latin">Tulisan Latin</label><input id="f_tulisan_latin" autocomplete="off"></div></div>
+      <div class="fld"><label for="f_wa">Nomor WhatsApp</label><input id="f_wa" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx"><div class="mute" id="waHint" hidden style="margin-top:4px"></div></div>
     </div>
+    <div class="fs">
+      <h3 class="sec">Pesanan dan pembayaran</h3>
+      <div class="row2"><div class="fld"><label for="f_jenis">Jenis pesanan</label><select id="f_jenis"></select></div>
+      <div class="fld"><label for="f_paket">Paket</label><select id="f_paket"></select></div></div>
+      <div class="row2"><div class="fld"><label for="f_tipe">Tipe pesanan</label><select id="f_tipe"><option>Reguler</option><option>Kilat</option></select></div>
+      <div class="fld"><label for="f_harga">Harga (Rp)</label><input id="f_harga" type="number" inputmode="numeric" min="0"></div></div>
+      <div id="kilatBox" hidden><div class="row2"><div class="fld"><label for="f_mulai">Mulai pengerjaan</label><input id="f_mulai" type="date"></div><div class="fld"><label for="f_mulai_jam">Jam mulai</label><input id="f_mulai_jam" type="time"></div></div><p class="mute" style="margin:-4px 0 10px">Target kilat 1 × 24 jam. Deadline di bawah tetap jadi acuan.</p></div>
+      <div class="row2"><div class="fld"><label for="f_bayar">Pembayaran</label><select id="f_bayar"></select></div>
+      <div class="fld" id="dpBox"><label for="f_dp">Jumlah DP (Rp)</label><input id="f_dp" type="number" inputmode="numeric" min="0"></div></div>
+      <div class="sisaRow" id="sisaBox"><span class="mute">Sisa pembayaran</span><b id="sisa">Rp0</b></div>
+      <div id="payBox" hidden>
+      <h3 class="sec">Riwayat pembayaran</h3>
+      <div id="payList"></div>
+      <div id="payDone" class="note" style="margin:0 0 8px" hidden>Pesanan ini sudah lunas.</div>
+      <div id="payNew">
+      <div class="fld"><label for="p_jenis">Jenis pembayaran</label><select id="p_jenis"></select></div>
+      <div class="row2"><div class="fld"><label for="p_jumlah">Jumlah (Rp)</label><input id="p_jumlah" type="number" inputmode="numeric" min="0"></div><div class="fld"><label for="p_tgl">Tanggal bayar</label><input id="p_tgl" type="date"></div></div>
+      <div class="fld"><label for="p_cat">Catatan pembayaran (opsional)</label><input id="p_cat" placeholder="Misal: transfer BCA" autocomplete="off"></div>
+      <p class="err" id="pErr" role="alert"></p>
+      <button class="btn ghost" id="bPay" style="margin:0 0 12px">Catat pembayaran</button>
+      </div>
+      </div>
     </div>
-    <h3 class="sec">Jadwal dan status</h3>
-    <div class="row2"><div class="fld"><label for="f_masuk">Tanggal masuk</label><input id="f_masuk" type="date"></div>
-    <div class="fld"><label for="f_deadline">Deadline</label><input id="f_deadline" type="date"></div></div>
-    <div class="row2"><div class="fld"><label for="f_jam">Jam deadline (opsional)</label><input id="f_jam" type="time"></div><div></div></div>
-    <div id="calBox" class="note" style="margin:0 0 12px" hidden><b>Google Calendar:</b> <span id="calSt"></span><button class="btn ghost" id="bCal" type="button" style="margin-top:8px">Tambahkan ke Google Calendar</button></div>
-    <div class="row2"><div class="fld"><label for="f_status">Status pengerjaan</label><select id="f_status"></select></div><div></div></div>
-    <h3 class="sec">Catatan dan file</h3>
-    <div class="fld"><label for="f_catatan">Catatan</label><textarea id="f_catatan"></textarea></div>
-    <div class="fld"><label for="f_link">Link file</label><input id="f_link" type="url" inputmode="url" placeholder="https://"></div>
-    <p class="err" id="err" role="alert"></p>
-    <button class="btn" id="bSave">Simpan pesanan</button>
-    <button class="btn ghost" id="bInv">Buat invoice (PDF)</button>
-    <a class="btn ghost" id="bWa" target="_blank" rel="noopener">Chat pelanggan di WhatsApp</a>
-    <button class="btn ghost" id="bDel">Hapus pesanan</button>
-    <button class="btn ghost" data-cancel="1">Batal</button>
+    <div class="fs">
+      <h3 class="sec">Jadwal dan status</h3>
+      <div class="row2"><div class="fld"><label for="f_masuk">Tanggal masuk</label><input id="f_masuk" type="date"></div>
+      <div class="fld"><label for="f_jam_masuk">Jam order</label><input id="f_jam_masuk" type="time"></div></div>
+      <div class="row2"><div class="fld"><label for="f_deadline">Deadline</label><input id="f_deadline" type="date"></div>
+      <div class="fld"><label for="f_jam">Jam deadline</label><input id="f_jam" type="time"></div></div>
+      <div class="fld"><label for="f_status">Status pengerjaan</label><select id="f_status"></select></div>
+      <div id="calBox" class="note" style="margin:0 0 12px" hidden><b>Google Calendar:</b> <span id="calSt"></span><button class="btn ghost" id="bCal" type="button" style="margin-top:8px">Tambahkan ke Google Calendar</button></div>
+    </div>
+    <details class="fs" id="moreBox">
+      <summary>Catatan, link file, admin<span>Ketuk untuk membuka atau menutup</span></summary>
+      <div class="fld"><label for="f_catatan">Catatan</label><textarea id="f_catatan"></textarea></div>
+      <div class="fld"><label for="f_link">Link file</label><input id="f_link" type="url" inputmode="url" placeholder="https://"></div>
+      <div class="row2"><div class="fld"><label for="f_admin">Admin</label><input id="f_admin" list="admins" autocomplete="off"><datalist id="admins"><option value="Fauziah"></datalist></div>
+      <div class="fld"><label for="f_id">ID pesanan</label><input id="f_id" readonly></div></div>
+    </details>
+    <div class="fact"><button class="btn ghost" id="bInv">Invoice</button><a class="btn ghost" id="bWa" target="_blank" rel="noopener">WhatsApp</a><button class="btn ghost" id="bDel">Hapus</button></div>
+    <div class="fbar"><p class="err" id="err" role="alert"></p><div class="row2"><button class="btn ghost" data-cancel="1">Batal</button><button class="btn" id="bSave">Simpan pesanan</button></div></div>
   </section>
 </main>
 <nav>
@@ -501,8 +527,8 @@ function openForm(id){
  const sel=(i,v)=>{const e=$(i);if(v&&![...e.options].some(x=>x.value===v))e.add(new Option(v,v))};
  sel('#f_jenis',o.jenis);$('#f_jenis').value=o.jenis;fillPaket();sel('#f_paket',o.paket);F.forEach(k=>$('#f_'+k).value=o[k]??'');
  $('#f_dp').readOnly=!!id;$('label[for=f_dp]').textContent=id?'Sudah dibayar (Rp)':'Jumlah DP (Rp)';$('#f_bayar').disabled=!!id;$('#payBox').hidden=!id;$('#p_tgl').value=day(0);$('#pErr').textContent='';pays=[];if(id)loadPays(id);
- $('#fTitle').textContent=id?'Edit pesanan':'Tambah pesanan';$('#bSave').textContent=id?'Simpan perubahan':'Simpan pesanan';
- $('#err').textContent='';bayarTog();kilatTog();waHint();$('#calBox').hidden=!id;if(id)calBox(o);
+ $('#fTitle').textContent=id?'Edit pesanan '+id:'Tambah pesanan';$('#bSave').textContent=id?'Simpan perubahan':'Simpan pesanan';
+ $('#err').textContent='';$('#moreBox').open=!!(o.catatan||o.link);bayarTog();kilatTog();waHint();$('#calBox').hidden=!id;if(id)calBox(o);
  const w=String(o.wa||'').replace(/\D/g,'').replace(/^0/,'62');
  $('#bWa').hidden=!id||!w;$('#bWa').href='https://wa.me/'+w;$('#bDel').hidden=!id;$('#bInv').hidden=!id;
  go('form');
