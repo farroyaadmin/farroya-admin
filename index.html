@@ -289,6 +289,7 @@ details.fs[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
 .fact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 14px}
 .fact .btn{margin:0;padding:11px 4px;font-size:12px}
 .fact [hidden]{display:none!important}
+.tr2{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px;color:inherit;font:inherit;cursor:pointer}
 </style>
 </head>
 <body>
@@ -310,6 +311,7 @@ details.fs[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
   <section id="v-cat" hidden></section>
   <section id="v-gcal" hidden></section>
   <section id="v-rkd" hidden></section>
+  <section id="v-tgh" hidden></section>
   <section id="v-inv" hidden></section>
 
   <section id="v-list" hidden>
@@ -418,7 +420,7 @@ const card=o=>{const d=dl(o),s=SCI[o.status]??0,p=BAYAR.indexOf(o.bayar),lt=isLa
 
 const IC=(d,w)=>`<svg width="${w||18}" height="${w||18}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
 const P={cal:'M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z',box:'M12 3l8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5M12 12v9',bar:'M5 20V10M12 20V4M19 20v-7',bell:'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0',doc:'M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v5h5M9 13h6M9 17h6',wal:'M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 10h18M16.5 14.5h.01',usr:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM5 20a7 7 0 0 1 14 0',set:'M4 7h10M18 7h2M4 17h2M10 17h10M14 5v4M6 15v4'};
-const tiles=()=>[['data-inv="1"','doc','Invoice'],['data-f="unpaid"','wal','Tagihan'],['data-go="cust"','usr','Pelanggan'],['data-go="set"','set','Pengaturan']].map(([a,i,t])=>`<button class="mt" ${a}>${IC(P[i],22)}${t}</button>`).join('');
+const tiles=()=>[['data-inv="1"','doc','Invoice'],['data-go="tgh"','wal','Tagihan'],['data-go="cust"','usr','Pelanggan'],['data-go="set"','set','Pengaturan']].map(([a,i,t])=>`<button class="mt" ${a}>${IC(P[i],22)}${t}</button>`).join('');
 const dd=s=>Math.round((new Date(s+'T00:00:00')-new Date(day(0)+'T00:00:00'))/864e5);
 let dtab='today';
 const trow=o=>{const lt=isLate(o),k=isKilat(o);return `<div class="tr${k?' kl2':''}${lt?' tlt':''}"><button class="tb" data-edit="${esc(o.id)}"><span class="r"><b>${k?BOLT+' ':''}${esc(o.logo||o.nama)}</b><span class="mute">${o.jam?esc(String(o.jam).replace(':','.')):'tanpa jam'}</span></span><span class="mute">${o.logo?esc(o.nama)+', ':''}${esc(o.paket)}</span><span class="bd"><span class="b s${SCI[o.status]??0}">${esc(o.status)}</span>${lt?`<span class="tl">TERLAMBAT ${esc(lateTxt(o))}</span>`:''}</span></button>${ACT(o)?`<button class="qa p" data-st="${esc(nextSt(o))}" data-id="${esc(o.id)}">${o.status==='Siap Kirim'?'Tandai selesai':'Lanjut: '+esc(nextSt(o))}</button>`:''}</div>`};
@@ -480,14 +482,14 @@ function renderList(){
  $('#res').innerHTML=r.length?r.map(card).join(''):'<p class="mute empty">Tidak ada pesanan yang cocok. Ubah kata kunci atau pilih filter lain.</p>';
  $('#count').textContent=invMode?'Pilih pesanan untuk dibuatkan invoice':r.length+' pesanan';
 }
-const VIEWS=['home','deadline','list','recap','more','cust','set','cat','gcal','rkd','form','inv','login'];
+const VIEWS=['home','deadline','list','recap','more','cust','set','cat','gcal','rkd','tgh','form','inv','login'];
 function go(v){
  view=v;if(v!=='list')invMode=false;
  document.body.classList.toggle('out',v==='login');document.body.dataset.v=v;
  VIEWS.forEach(k=>$('#v-'+k).hidden=k!==v);
- const nk={cust:'cust',rkd:'recap',set:'more',cat:'more',gcal:'more',inv:'list',form:'list'}[v]||v;
+ const nk={cust:'cust',rkd:'recap',tgh:'recap',set:'more',cat:'more',gcal:'more',inv:'list',form:'list'}[v]||v;
  document.querySelectorAll('nav button[id]').forEach(b=>b.classList.toggle('on',b.id==='n-'+nk));
- const R={home:renderHome,deadline:renderDeadline,recap:renderRecap,rkd:renderRkd,more:renderMore,cust:renderCust,set:renderSet,cat:renderCat,gcal:renderGcal,list:()=>{$('#q').value=q;renderList()}};
+ const R={home:renderHome,deadline:renderDeadline,recap:renderRecap,rkd:renderRkd,tgh:renderTgh,more:renderMore,cust:renderCust,set:renderSet,cat:renderCat,gcal:renderGcal,list:()=>{$('#q').value=q;renderList()}};
  if(R[v])R[v]();navBadge();
  window.scrollTo(0,0);
 }
@@ -618,24 +620,33 @@ function renderRkd(){
  const po=orders.filter(o=>o.status!=='Batal'&&pkey(o.masuk||day(0))[0]===rkKey);
  const tot=pp.reduce((a,p)=>a+(+p.jumlah||0),0),by={};pp.forEach(p=>{const k=K[p.id]||'Cicilan';(by[k]=by[k]||{n:0,v:0});by[k].n++;by[k].v+=+p.jumlah||0});
  const omz=po.reduce((a,o)=>a+(+o.harga||0),0),sis=po.reduce((a,o)=>a+sisa(o),0);
+ const bl=po.filter(o=>sisa(o)>0),bd=bl.filter(o=>(+o.dp||0)>0),bb=bl.filter(o=>!(+o.dp||0)),sm=a=>a.reduce((t,o)=>t+sisa(o),0);
  $('#v-rkd').innerHTML=`<button class="btn ghost" data-go="recap" style="margin-top:0">‹ Kembali ke rekap</button><h1 style="margin-top:14px">${keyLbl(rkKey)}</h1>
  <div class="tile wide" style="cursor:default"><b>${pp.length}</b><div><span>Pembayaran diterima</span><em>Uang masuk ${rp(tot)}</em><span>${po.length} pesanan masuk, nilai ${rp(omz)}, belum lunas ${rp(sis)}</span></div></div>
  <h2>Uang masuk berasal dari</h2>${['DP','Cicilan','Pelunasan','Pengembalian'].filter(k=>by[k]).map(k=>`<div class="rkb"><span><span class="kd k-${k}">${k}</span> ${by[k].n} pembayaran</span><b>${rp(by[k].v)}</b></div>`).join('')||'<p class="mute">Belum ada pembayaran pada periode ini.</p>'}
+ <h2>Belum lunas (${bl.length} pesanan)</h2>${bl.length?`<div class="rkb"><span>Sisa DP atau cicilan (${bd.length} pesanan)</span><b>${rp(sm(bd))}</b></div><div class="rkb"><span>Belum bayar sama sekali (${bb.length} pesanan)</span><b>${rp(sm(bb))}</b></div>`+bl.map(o=>`<button class="card" data-edit="${esc(o.id)}"><div class="r"><b>${esc(o.logo||o.nama)}</b><b>${rp(sisa(o))}</b></div><div class="mute">Pemesan: ${esc(o.nama)}${o.wa?', '+esc(o.wa):''}</div><div class="mute">Harga ${rp(o.harga)}, dibayar ${rp(o.dp)}, ${(+o.dp||0)>0?'sisa DP':'belum bayar'}</div></button>`).join(''):'<p class="mute">Semua pesanan pada periode ini sudah lunas.</p>'}
  <h2>Rincian pembayaran</h2>${pp.map(p=>{const o=om.get(p.order_id),k=K[p.id]||'Cicilan';return `<button class="card" data-edit="${esc(o.id)}"><div class="r"><b>${esc(o.logo||o.nama)}</b><span class="kd k-${k}">${k}</span></div><div class="mute">${o.logo?'Pemesan: '+esc(o.nama)+', ':''}${esc(o.paket)}, ${esc(o.id)}</div><div class="r"><span class="mute">${fd(p.tanggal)}${p.catatan?', '+esc(p.catatan):''}${o.status==='Batal'?', pesanan batal':''}</span><b>${rp(p.jumlah)}</b></div></button>`}).join('')||'<p class="mute">Tidak ada.</p>'}
  <h2>Pesanan masuk (nilai pesanan)</h2>${po.map(o=>`<button class="card" data-edit="${esc(o.id)}"><div class="r"><b>${esc(o.logo||o.nama)}</b><b>${rp(o.harga)}</b></div><div class="mute">${o.logo?'Pemesan: '+esc(o.nama)+', ':''}${esc(o.paket)}, ${esc(o.id)}</div><div class="r"><span class="mute">${esc(o.status)}</span><span class="mute">${sisa(o)>0?'Sisa '+rp(sisa(o)):'Lunas'}</span></div></button>`).join('')||'<p class="mute">Tidak ada pesanan masuk pada periode ini.</p>'}
  <p class="mute" style="margin-top:12px">Jenis pembayaran ditentukan otomatis: pembayaran pertama dihitung DP, pembayaran yang membuat pesanan lunas dihitung Pelunasan, dan yang di antaranya Cicilan.</p>`;
 }
+function renderTgh(){
+ const m={};orders.filter(o=>sisa(o)>0).forEach(o=>{const k=waN(o.wa)||'n:'+String(o.nama).trim().toLowerCase(),c=m[k]||(m[k]={nama:o.nama,wa:o.wa,os:[],s:0});c.os.push(o);c.s+=sisa(o)});
+ const r=Object.values(m).sort((a,b)=>b.s-a.s),tot=r.reduce((a,c)=>a+c.s,0);
+ $('#v-tgh').innerHTML=`<button class="btn ghost" data-go="recap" style="margin-top:0">‹ Kembali ke rekap</button><h1 style="margin-top:14px">Pelanggan belum lunas</h1><div class="mute">${r.length} pelanggan, total sisa ${rp(tot)} dari semua periode. Pesanan batal tidak dihitung.</div>`+(r.map(c=>{const n=waN(c.wa),t=encodeURIComponent('Assalamualaikum Kak '+c.nama+', kami dari Farroya Arabic Design. Mengingatkan sisa pembayaran pesanan '+c.os.map(o=>o.logo||o.id).join(', ')+' sebesar '+rp(c.s)+'. Terima kasih.');
+  return `<div class="card" style="cursor:default;margin-top:10px"><div class="r"><b>${esc(c.nama)}</b><b>${rp(c.s)}</b></div><div class="mute">${esc(c.wa||'Tanpa nomor WhatsApp')}, ${c.os.length} pesanan</div>${c.os.map(o=>`<button class="tr2" data-edit="${esc(o.id)}"><span><b>${esc(o.logo||o.id)}</b><br><span class="mute">${esc(o.paket)}, dibayar ${rp(o.dp)} dari ${rp(o.harga)}</span></span><b>${rp(sisa(o))}</b></button>`).join('')}${n?`<a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/${n}?text=${t}" style="margin-top:8px">Ingatkan via WhatsApp</a>`:''}</div>`}).join('')||'<p class="mute empty">Tidak ada tagihan. Semua pesanan sudah lunas.</p>');
+}
 function renderRecap(){
- const g={},get=s=>{const[k,l]=pkey(s);return g[k]||(g[k]={k,l,n:0,v:0,p:0,u:0})};
- orders.filter(o=>o.status!=='Batal').forEach(o=>{const x=get(o.masuk||day(0));x.n++;x.v+=+o.harga||0;x.u+=sisa(o)});
+ const g={},get=s=>{const[k,l]=pkey(s);return g[k]||(g[k]={k,l,n:0,v:0,p:0,u:0,ud:0,ub:0})};
+ orders.filter(o=>o.status!=='Batal').forEach(o=>{const x=get(o.masuk||day(0));x.n++;x.v+=+o.harga||0;x.u+=sisa(o);if((+o.dp||0)>0)x.ud+=sisa(o);else x.ub+=sisa(o)});
  const ids=new Set(orders.map(o=>o.id));allPays.filter(p=>ids.has(p.order_id)).forEach(p=>{get(p.tanggal||day(0)).p+=+p.jumlah||0});
  const rows=Object.keys(g).sort().reverse().map(k=>g[k]);lastRekap=rows;
- const T=rows.reduce((a,x)=>({n:a.n+x.n,v:a.v+x.v,p:a.p+x.p,u:a.u+x.u}),{n:0,v:0,p:0,u:0});
+ const T=rows.reduce((a,x)=>({n:a.n+x.n,v:a.v+x.v,p:a.p+x.p,u:a.u+x.u,ud:a.ud+x.ud,ub:a.ub+x.ub}),{n:0,v:0,p:0,u:0,ud:0,ub:0});
  $('#v-recap').innerHTML=`<h1>Rekap keuangan</h1><div class="mute">Nilai pesanan dan belum lunas dihitung dari tanggal pesanan masuk. Uang masuk dihitung dari tanggal pembayaran diterima. Pesanan batal tidak dihitung.</div>
  <div class="chips" style="margin-top:14px">${['Harian','Mingguan','Bulanan','Tahunan'].map(p=>`<button class="chip${per===p?' on':''}" data-per="${p}">${p}</button>`).join('')}</div>
- <div class="tile wide" style="cursor:default"><b>${T.n}</b><div><span>Total pesanan (tanpa batal)</span><em>Uang masuk ${rp(T.p)}</em><span>Nilai ${rp(T.v)}, belum lunas ${rp(T.u)}</span></div></div>
+ <div class="tile wide" style="cursor:default"><b>${T.n}</b><div><span>Total pesanan (tanpa batal)</span><em>Uang masuk ${rp(T.p)}</em><span>Nilai ${rp(T.v)}, belum lunas ${rp(T.u)}</span><span>Sisa DP ${rp(T.ud)} • Belum bayar ${rp(T.ub)}</span></div></div>
  <h2>Per ${per==='Harian'?'hari':per==='Mingguan'?'minggu':per==='Bulanan'?'bulan':'tahun'}</h2>
- ${rows.map(x=>`<button class="card rc" data-rkd="${esc(x.k)}"><div class="r"><b>${x.l}</b><span class="mute">${x.n} pesanan masuk ›</span></div><div class="g"><div><span>Nilai pesanan</span><b>${rp(x.v)}</b></div><div><span>Uang masuk</span><b>${rp(x.p)}</b></div><div><span>Belum lunas</span><b>${rp(x.u)}</b></div></div></button>`).join('')||'<p class="mute empty">Belum ada data untuk direkap.</p>'}
+ ${rows.map(x=>`<button class="card rc" data-rkd="${esc(x.k)}"><div class="r"><b>${x.l}</b><span class="mute">${x.n} pesanan masuk ›</span></div><div class="g"><div><span>Nilai pesanan</span><b>${rp(x.v)}</b></div><div><span>Uang masuk</span><b>${rp(x.p)}</b></div><div><span>Belum lunas</span><b>${rp(x.u)}</b></div></div>${x.u>0?`<div class="mute" style="margin-top:6px">Sisa DP ${rp(x.ud)} • Belum bayar ${rp(x.ub)}</div>`:''}</button>`).join('')||'<p class="mute empty">Belum ada data untuk direkap.</p>'}
+ <button class="btn ghost" data-go="tgh">Pelanggan belum lunas (semua periode)</button>
  <button class="btn ghost" id="bExpRekap">Ekspor rekap (CSV)</button>`;
 }
 function showInv(id){
@@ -722,11 +733,11 @@ async function expData(k){
  const nm={};orders.forEach(o=>nm[o.id]=o.nama);
  saveFile('farroya-pembayaran-'+d+'.csv',csv(['Tanggal bayar','ID pesanan','Nama','Jumlah','Catatan'],[...allPays].sort((a,b)=>String(a.tanggal).localeCompare(String(b.tanggal))).map(p=>[p.tanggal,p.order_id,nm[p.order_id]||'',p.jumlah,p.catatan])));
 }
-function expRekap(){saveFile('farroya-rekap-'+per.toLowerCase()+'-'+day(0)+'.csv',csv(['Periode','Pesanan masuk','Nilai pesanan','Uang masuk','Belum lunas'],lastRekap.map(x=>[x.l,x.n,x.v,x.p,x.u])))}
+function expRekap(){saveFile('farroya-rekap-'+per.toLowerCase()+'-'+day(0)+'.csv',csv(['Periode','Pesanan masuk','Nilai pesanan','Uang masuk','Belum lunas','Sisa DP','Belum bayar'],lastRekap.map(x=>[x.l,x.n,x.v,x.p,x.u,x.ud,x.ub])))}
 const SB_URL='https://xbnpvtwvmnkhiymolorv.supabase.co',SB_KEY='sb_publishable_Ben-KEjcyCQJYT2Jmi4ngg_Ne6mwMIA';
 const sb=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
 async function loadOrders(){const[a,b]=await Promise.all([sb.from('orders').select('*'),sb.from('payments').select('*')]);if(a.error){toast('Gagal memuat data');return false}orders=(a.data||[]).map(o=>({...o,status:normSt(o.status),tipe:o.tipe||'Reguler'}));allPays=b.error?[]:(b.data||[]);return true}
-async function refresh(){if(!authed)return;await loadOrders();if(view==='home')renderHome();else if(view==='list')renderList();else if(view==='recap')renderRecap();else if(view==='deadline')renderDeadline();else if(view==='cust')renderCust();else if(view==='rkd')renderRkd();navBadge()}
+async function refresh(){if(!authed)return;await loadOrders();if(view==='home')renderHome();else if(view==='list')renderList();else if(view==='recap')renderRecap();else if(view==='deadline')renderDeadline();else if(view==='cust')renderCust();else if(view==='rkd')renderRkd();else if(view==='tgh')renderTgh();navBadge()}
 async function enter(s){userEmail=s.user.email||'';authed=true;await Promise.all([loadOrders(),loadCatalog(),loadCfg()]);go('home');{const h=decodeURIComponent(location.hash.slice(1));if(h&&orders.some(o=>o.id===h))openForm(h)}}
 async function doLogin(){
  if(!sb)return;
